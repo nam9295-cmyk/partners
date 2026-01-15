@@ -181,147 +181,147 @@ const SupportersPage = () => {
                         <div
                             onClick={() => setSelectedProduct('A')}
                             className={`relative cursor-pointer rounded-2xl transition-all duration-300 overflow-hidden group ${selectedProduct === 'A'
-                                    ? 'ring-4 ring-rose-300 shadow-lg shadow-rose-200 scale-[1.02] z-10'
-                                    : selectedProduct !== null
-                                        ? 'opacity-40 blur-[2px] scale-95 border-2 border-transparent hover:opacity-100 hover:blur-0 hover:scale-100'
-                                        : 'border-2 border-gray-100 hover:border-rose-200 hover:shadow-md'
-                                }`}}
-                        >
-                        <img
-                            src={productImageA}
-                            alt="A세트"
-                            className="w-full h-auto object-cover aspect-square"
-                        />
-                        <div className={`absolute bottom-0 w-full p-3 text-center transition-colors duration-300 ${selectedProduct === 'A' ? 'bg-rose-500/90 text-white' : 'bg-gray-100/80 text-gray-500 group-hover:bg-rose-100/80 group-hover:text-rose-600'
-                            }`}>
-                            <span className="font-bold text-lg">A세트</span>
-                        </div>
-                    </div>
-
-                    {/* B세트 */}
-                    <div
-                        onClick={() => setSelectedProduct('B')}
-                        className={`relative cursor-pointer rounded-2xl transition-all duration-300 overflow-hidden group ${selectedProduct === 'B'
                                 ? 'ring-4 ring-rose-300 shadow-lg shadow-rose-200 scale-[1.02] z-10'
                                 : selectedProduct !== null
                                     ? 'opacity-40 blur-[2px] scale-95 border-2 border-transparent hover:opacity-100 hover:blur-0 hover:scale-100'
                                     : 'border-2 border-gray-100 hover:border-rose-200 hover:shadow-md'
-                            }`}}
+                                }`}
                         >
-                    <img
-                        src={productImageB}
-                        alt="B세트"
-                        className="w-full h-auto object-cover aspect-square"
-                    />
-                    <div className={`absolute bottom-0 w-full p-3 text-center transition-colors duration-300 ${selectedProduct === 'B' ? 'bg-rose-500/90 text-white' : 'bg-gray-100/80 text-gray-500 group-hover:bg-rose-100/80 group-hover:text-rose-600'
-                        }`}>
-                        <span className="font-bold text-lg">B세트</span>
+                            <img
+                                src={productImageA}
+                                alt="A세트"
+                                className="w-full h-auto object-cover aspect-square"
+                            />
+                            <div className={`absolute bottom-0 w-full p-3 text-center transition-colors duration-300 ${selectedProduct === 'A' ? 'bg-rose-500/90 text-white' : 'bg-gray-100/80 text-gray-500 group-hover:bg-rose-100/80 group-hover:text-rose-600'
+                                }`}>
+                                <span className="font-bold text-lg">A세트</span>
+                            </div>
+                        </div>
+
+                        {/* B세트 */}
+                        <div
+                            onClick={() => setSelectedProduct('B')}
+                            className={`relative cursor-pointer rounded-2xl transition-all duration-300 overflow-hidden group ${selectedProduct === 'B'
+                                ? 'ring-4 ring-rose-300 shadow-lg shadow-rose-200 scale-[1.02] z-10'
+                                : selectedProduct !== null
+                                    ? 'opacity-40 blur-[2px] scale-95 border-2 border-transparent hover:opacity-100 hover:blur-0 hover:scale-100'
+                                    : 'border-2 border-gray-100 hover:border-rose-200 hover:shadow-md'
+                                }`}
+                        >
+                            <img
+                                src={productImageB}
+                                alt="B세트"
+                                className="w-full h-auto object-cover aspect-square"
+                            />
+                            <div className={`absolute bottom-0 w-full p-3 text-center transition-colors duration-300 ${selectedProduct === 'B' ? 'bg-rose-500/90 text-white' : 'bg-gray-100/80 text-gray-500 group-hover:bg-rose-100/80 group-hover:text-rose-600'
+                                }`}>
+                                <span className="font-bold text-lg">B세트</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-                {/* 입력 폼 영역 */ }
-    <form onSubmit={handleSubmit} className="space-y-5">
+                {/* 입력 폼 영역 */}
+                <form onSubmit={handleSubmit} className="space-y-5">
 
-        {/* 성함 입력란 */}
-        <div>
-            <label htmlFor="name" className="block text-sm font-medium text-amber-900 mb-2">
-                성함 <span className="text-rose-400">*</span>
-            </label>
-            <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                className="w-full px-5 py-3 border-2 border-rose-100 rounded-xl focus:ring-2 focus:ring-rose-300 focus:border-rose-300 outline-none transition-all duration-200 bg-white/70 placeholder-rose-300"
-                placeholder="홍길동"
-                required
-            />
-        </div>
+                    {/* 성함 입력란 */}
+                    <div>
+                        <label htmlFor="name" className="block text-sm font-medium text-amber-900 mb-2">
+                            성함 <span className="text-rose-400">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleInputChange}
+                            className="w-full px-5 py-3 border-2 border-rose-100 rounded-xl focus:ring-2 focus:ring-rose-300 focus:border-rose-300 outline-none transition-all duration-200 bg-white/70 placeholder-rose-300"
+                            placeholder="홍길동"
+                            required
+                        />
+                    </div>
 
-        {/* 전화번호 입력란 */}
-        <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-amber-900 mb-2">
-                전화번호 <span className="text-rose-400">*</span>
-            </label>
-            <input
-                type="tel"
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleInputChange}
-                className="w-full px-5 py-3 border-2 border-rose-100 rounded-xl focus:ring-2 focus:ring-rose-300 focus:border-rose-300 outline-none transition-all duration-200 bg-white/70 placeholder-rose-300"
-                placeholder="010-1234-5678"
-                required
-            />
-        </div>
+                    {/* 전화번호 입력란 */}
+                    <div>
+                        <label htmlFor="phone" className="block text-sm font-medium text-amber-900 mb-2">
+                            전화번호 <span className="text-rose-400">*</span>
+                        </label>
+                        <input
+                            type="tel"
+                            id="phone"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleInputChange}
+                            className="w-full px-5 py-3 border-2 border-rose-100 rounded-xl focus:ring-2 focus:ring-rose-300 focus:border-rose-300 outline-none transition-all duration-200 bg-white/70 placeholder-rose-300"
+                            placeholder="010-1234-5678"
+                            required
+                        />
+                    </div>
 
-        {/* 블로그 ID 또는 URL 입력란 */}
-        <div>
-            <label htmlFor="blogId" className="block text-sm font-medium text-amber-900 mb-2">
-                블로그 ID 또는 URL <span className="text-rose-400">*</span>
-            </label>
-            <input
-                type="text"
-                id="blogId"
-                name="blogId"
-                value={formData.blogId}
-                onChange={handleInputChange}
-                className="w-full px-5 py-3 border-2 border-rose-100 rounded-xl focus:ring-2 focus:ring-rose-300 focus:border-rose-300 outline-none transition-all duration-200 bg-white/70 placeholder-rose-300"
-                placeholder="blog.naver.com/yourid 또는 블로그 ID"
-                required
-            />
-        </div>
+                    {/* 블로그 ID 또는 URL 입력란 */}
+                    <div>
+                        <label htmlFor="blogId" className="block text-sm font-medium text-amber-900 mb-2">
+                            블로그 ID 또는 URL <span className="text-rose-400">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="blogId"
+                            name="blogId"
+                            value={formData.blogId}
+                            onChange={handleInputChange}
+                            className="w-full px-5 py-3 border-2 border-rose-100 rounded-xl focus:ring-2 focus:ring-rose-300 focus:border-rose-300 outline-none transition-all duration-200 bg-white/70 placeholder-rose-300"
+                            placeholder="blog.naver.com/yourid 또는 블로그 ID"
+                            required
+                        />
+                    </div>
 
-        {/* 배송지 주소 입력란 */}
-        <div>
-            <label htmlFor="address" className="block text-sm font-medium text-amber-900 mb-2">
-                배송지 주소 <span className="text-rose-400">*</span>
-            </label>
-            <textarea
-                id="address"
-                name="address"
-                value={formData.address}
-                onChange={handleInputChange}
-                rows="3"
-                className="w-full px-5 py-3 border-2 border-rose-100 rounded-xl focus:ring-2 focus:ring-rose-300 focus:border-rose-300 outline-none transition-all duration-200 bg-white/70 placeholder-rose-300 resize-none"
-                placeholder="우편번호, 도로명 주소, 상세주소를 모두 입력해주세요"
-                required
-            />
-        </div>
+                    {/* 배송지 주소 입력란 */}
+                    <div>
+                        <label htmlFor="address" className="block text-sm font-medium text-amber-900 mb-2">
+                            배송지 주소 <span className="text-rose-400">*</span>
+                        </label>
+                        <textarea
+                            id="address"
+                            name="address"
+                            value={formData.address}
+                            onChange={handleInputChange}
+                            rows="3"
+                            className="w-full px-5 py-3 border-2 border-rose-100 rounded-xl focus:ring-2 focus:ring-rose-300 focus:border-rose-300 outline-none transition-all duration-200 bg-white/70 placeholder-rose-300 resize-none"
+                            placeholder="우편번호, 도로명 주소, 상세주소를 모두 입력해주세요"
+                            required
+                        />
+                    </div>
 
-        {/* 동의 영역 */}
-        <div className="flex items-start pt-2">
-            <input
-                type="checkbox"
-                id="agreement"
-                checked={isAgreed}
-                onChange={(e) => setIsAgreed(e.target.checked)}
-                className="mt-1 h-5 w-5 text-rose-400 border-rose-200 rounded focus:ring-rose-300 accent-rose-400"
-            />
-            <label htmlFor="agreement" className="ml-3 text-sm text-amber-800">
-                개인정보 수집 및 이용에 동의합니다. <span className="text-rose-400">*</span>
-            </label>
-        </div>
+                    {/* 동의 영역 */}
+                    <div className="flex items-start pt-2">
+                        <input
+                            type="checkbox"
+                            id="agreement"
+                            checked={isAgreed}
+                            onChange={(e) => setIsAgreed(e.target.checked)}
+                            className="mt-1 h-5 w-5 text-rose-400 border-rose-200 rounded focus:ring-rose-300 accent-rose-400"
+                        />
+                        <label htmlFor="agreement" className="ml-3 text-sm text-amber-800">
+                            개인정보 수집 및 이용에 동의합니다. <span className="text-rose-400">*</span>
+                        </label>
+                    </div>
 
-        {/* 제출 버튼 */}
-        <div className="pt-4">
-            <button
-                type="submit"
-                className="w-full bg-gradient-to-r from-amber-700 via-amber-800 to-amber-900 text-white py-4 px-6 rounded-xl font-semibold shadow-lg shadow-amber-900/30 hover:shadow-xl hover:shadow-amber-900/40 hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-rose-300"
-            >
-                🍫 제출하기
-            </button>
-        </div>
+                    {/* 제출 버튼 */}
+                    <div className="pt-4">
+                        <button
+                            type="submit"
+                            className="w-full bg-gradient-to-r from-amber-700 via-amber-800 to-amber-900 text-white py-4 px-6 rounded-xl font-semibold shadow-lg shadow-amber-900/30 hover:shadow-xl hover:shadow-amber-900/40 hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-rose-300"
+                        >
+                            🍫 제출하기
+                        </button>
+                    </div>
 
-        {/* 브랜드 푸터 */}
-        <p className="text-center text-xs text-rose-300 mt-6">
-            © VeryGood Chocolate. All rights reserved.
-        </p>
+                    {/* 브랜드 푸터 */}
+                    <p className="text-center text-xs text-rose-300 mt-6">
+                        © VeryGood Chocolate. All rights reserved.
+                    </p>
 
-    </form>
+                </form>
             </div >
         </div >
     );
