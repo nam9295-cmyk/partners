@@ -7,8 +7,15 @@ import productImageB from './assets/product_b.webp';
 import { db } from './firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
+// 비밀 코드 상수 정의
+const SECRET_CODE = "VERYGOOD0717";
+
 const SupportersPage = () => {
-    // 폼 데이터 상태 관리
+    // === Gatekeeper 상태 관리 ===
+    const [isVerified, setIsVerified] = useState(false);
+    const [accessCode, setAccessCode] = useState('');
+
+    // === 기존 폼 데이터 상태 관리 ===
     const [formData, setFormData] = useState({
         name: '',
         phone: '',
@@ -25,7 +32,18 @@ const SupportersPage = () => {
     // 제출 상태 관리
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // 입력 필드 변경 핸들러
+    // === Gatekeeper 핸들러 ===
+    const handleCodeCheck = (e) => {
+        e.preventDefault();
+        if (accessCode.toUpperCase().trim() === SECRET_CODE) {
+            setIsVerified(true);
+        } else {
+            alert('코드가 올바르지 않습니다. 다시 확인해주세요.');
+            setAccessCode('');
+        }
+    };
+
+    // === 기존 핸들러들 ===
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -34,27 +52,22 @@ const SupportersPage = () => {
         }));
     };
 
-    // 폼 제출 핸들러
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // 제품 선택 유효성 검사
         if (!selectedProduct) {
             alert('체험하실 제품을 선택해주세요!');
             return;
         }
 
-        // 동의 체크박스 유효성 검사
         if (!isAgreed) {
             alert('개인정보 수집 및 이용에 동의해주세요.');
             return;
         }
 
-        // 제출 시작
         setIsSubmitting(true);
 
         try {
-            // Firestore에 데이터 저장
             await addDoc(collection(db, "supporters"), {
                 name: formData.name,
                 phone: formData.phone,
@@ -65,14 +78,8 @@ const SupportersPage = () => {
                 createdAt: serverTimestamp()
             });
 
-            // 성공 알림 및 초기화
             alert('신청이 완료되었습니다! 🎉');
-            setFormData({
-                name: '',
-                phone: '',
-                blogId: '',
-                address: ''
-            });
+            setFormData({ name: '', phone: '', blogId: '', address: '' });
             setSelectedProduct(null);
             setIsAgreed(false);
 
@@ -84,6 +91,36 @@ const SupportersPage = () => {
         }
     };
 
+    // === [화면 1] Gatekeeper (잠금 화면) ===
+    if (!isVerified) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-amber-50 flex items-center justify-center p-4">
+                <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl shadow-rose-200/50 max-w-md w-full p-8 text-center border border-rose-100">
+                    <img src="/logo.png" alt="Logo" className="h-16 mx-auto mb-6 object-contain" />
+                    <h2 className="text-2xl font-bold text-amber-900 mb-2">입장 코드</h2>
+                    <p className="text-amber-800/70 mb-8 text-sm">전달받으신 코드를 입력해주세요.</p>
+
+                    <form onSubmit={handleCodeCheck} className="space-y-4">
+                        <input
+                            type="password"
+                            value={accessCode}
+                            onChange={(e) => setAccessCode(e.target.value)}
+                            className="w-full px-5 py-3 border-2 border-rose-100 rounded-xl focus:ring-2 focus:ring-rose-300 focus:border-rose-300 outline-none transition-all text-center text-lg tracking-widest placeholder-rose-200"
+                            placeholder="CODE"
+                        />
+                        <button
+                            type="submit"
+                            className="w-full bg-gradient-to-r from-rose-400 to-rose-500 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-rose-200 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+                        >
+                            입장하기 🔓
+                        </button>
+                    </form>
+                </div>
+            </div>
+        );
+    }
+
+    // === [화면 2] 체험단 신청 폼 (기존 화면) ===
     return (
         <div className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-amber-50 flex items-center justify-center p-4">
             <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl shadow-rose-200/50 max-w-2xl w-full p-8 md:p-10">
@@ -267,7 +304,7 @@ const SupportersPage = () => {
                             value={formData.name}
                             onChange={handleInputChange}
                             className="w-full px-5 py-3 border-2 border-rose-100 rounded-xl focus:ring-2 focus:ring-rose-300 focus:border-rose-300 outline-none transition-all duration-200 bg-white/70 placeholder-rose-300"
-                            placeholder="홍길동"
+                            placeholder="체험단 등록 성함"
                             required
                         />
                     </div>
@@ -275,7 +312,7 @@ const SupportersPage = () => {
                     {/* 전화번호 입력란 */}
                     <div>
                         <label htmlFor="phone" className="block text-sm font-medium text-amber-900 mb-2">
-                            전화번호 <span className="text-rose-400">*</span>
+                            연락처 <span className="text-rose-400">*</span>
                         </label>
                         <input
                             type="tel"
@@ -284,7 +321,7 @@ const SupportersPage = () => {
                             value={formData.phone}
                             onChange={handleInputChange}
                             className="w-full px-5 py-3 border-2 border-rose-100 rounded-xl focus:ring-2 focus:ring-rose-300 focus:border-rose-300 outline-none transition-all duration-200 bg-white/70 placeholder-rose-300"
-                            placeholder="010-1234-5678"
+                            placeholder="010-0000-0000"
                             required
                         />
                     </div>
@@ -301,7 +338,7 @@ const SupportersPage = () => {
                             value={formData.blogId}
                             onChange={handleInputChange}
                             className="w-full px-5 py-3 border-2 border-rose-100 rounded-xl focus:ring-2 focus:ring-rose-300 focus:border-rose-300 outline-none transition-all duration-200 bg-white/70 placeholder-rose-300"
-                            placeholder="blog.naver.com/yourid 또는 블로그 ID"
+                            placeholder="블로그 ID 또는 URL"
                             required
                         />
                     </div>
