@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import Lottie from 'lottie-react';
 import firecrackerAnimation from './assets/firecracker.json';
 import missionCheckAnimation from './assets/mission_check.json';
+import productImageA from './assets/product_a.webp';
+import productImageB from './assets/product_b.webp';
 
 const SupportersPage = () => {
     // 폼 데이터 상태 관리
@@ -11,6 +13,9 @@ const SupportersPage = () => {
         blogId: '',
         address: ''
     });
+
+    // 제품 선택 상태 관리
+    const [selectedProduct, setSelectedProduct] = useState(null);
 
     // 동의 체크박스 상태 관리
     const [isAgreed, setIsAgreed] = useState(false);
@@ -28,6 +33,12 @@ const SupportersPage = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
+        // 제품 선택 유효성 검사
+        if (!selectedProduct) {
+            alert('체험하실 제품을 선택해주세요!');
+            return;
+        }
+
         // 동의 체크박스 유효성 검사
         if (!isAgreed) {
             alert('개인정보 수집 및 이용에 동의해주세요.');
@@ -35,8 +46,11 @@ const SupportersPage = () => {
         }
 
         // 폼 데이터 콘솔 출력 (Firebase 연동 전 확인용)
-        console.log('제출된 폼 데이터:', formData);
-        console.log('개인정보 동의:', isAgreed);
+        console.log('제출된 폼 데이터:', {
+            ...formData,
+            selectedProduct,
+            isAgreed
+        });
     };
 
     return (
@@ -152,6 +166,52 @@ const SupportersPage = () => {
                                         {tag}
                                     </span>
                                 ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* 제품 선택 영역 */}
+                <div className="mb-8">
+                    <label className="block text-sm font-medium text-amber-900 mb-3">
+                        체험하실 제품을 선택해주세요 <span className="text-rose-400">*</span>
+                    </label>
+                    <div className="grid grid-cols-2 gap-4">
+                        {/* A세트 */}
+                        <div
+                            onClick={() => setSelectedProduct('A')}
+                            className={`relative cursor-pointer rounded-2xl transition-all duration-300 overflow-hidden group ${selectedProduct === 'A'
+                                    ? 'ring-4 ring-rose-300 shadow-lg shadow-rose-200 scale-[1.02]'
+                                    : 'border-2 border-gray-100 hover:border-rose-200 grayscale opacity-60 hover:opacity-100 hover:grayscale-0'
+                                }`}
+                        >
+                            <img
+                                src={productImageA}
+                                alt="A세트"
+                                className="w-full h-auto object-cover aspect-square"
+                            />
+                            <div className={`absolute bottom-0 w-full p-3 text-center transition-colors duration-300 ${selectedProduct === 'A' ? 'bg-rose-500/90 text-white' : 'bg-gray-100/80 text-gray-500 group-hover:bg-rose-100/80 group-hover:text-rose-600'
+                                }`}>
+                                <span className="font-bold text-lg">A세트</span>
+                            </div>
+                        </div>
+
+                        {/* B세트 */}
+                        <div
+                            onClick={() => setSelectedProduct('B')}
+                            className={`relative cursor-pointer rounded-2xl transition-all duration-300 overflow-hidden group ${selectedProduct === 'B'
+                                    ? 'ring-4 ring-rose-300 shadow-lg shadow-rose-200 scale-[1.02]'
+                                    : 'border-2 border-gray-100 hover:border-rose-200 grayscale opacity-60 hover:opacity-100 hover:grayscale-0'
+                                }`}
+                        >
+                            <img
+                                src={productImageB}
+                                alt="B세트"
+                                className="w-full h-auto object-cover aspect-square"
+                            />
+                            <div className={`absolute bottom-0 w-full p-3 text-center transition-colors duration-300 ${selectedProduct === 'B' ? 'bg-rose-500/90 text-white' : 'bg-gray-100/80 text-gray-500 group-hover:bg-rose-100/80 group-hover:text-rose-600'
+                                }`}>
+                                <span className="font-bold text-lg">B세트</span>
                             </div>
                         </div>
                     </div>
