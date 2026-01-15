@@ -4,6 +4,8 @@ import firecrackerAnimation from './assets/firecracker.json';
 import missionCheckAnimation from './assets/mission_check.json';
 import productImageA from './assets/product_a.webp';
 import productImageB from './assets/product_b.webp';
+import { db } from './firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const SupportersPage = () => {
     // 폼 데이터 상태 관리
@@ -20,6 +22,9 @@ const SupportersPage = () => {
     // 동의 체크박스 상태 관리
     const [isAgreed, setIsAgreed] = useState(false);
 
+    // 제출 상태 관리
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     // 입력 필드 변경 핸들러
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -30,7 +35,7 @@ const SupportersPage = () => {
     };
 
     // 폼 제출 핸들러
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         // 제품 선택 유효성 검사
@@ -45,12 +50,38 @@ const SupportersPage = () => {
             return;
         }
 
-        // 폼 데이터 콘솔 출력 (Firebase 연동 전 확인용)
-        console.log('제출된 폼 데이터:', {
-            ...formData,
-            selectedProduct,
-            isAgreed
-        });
+        // 제출 시작
+        setIsSubmitting(true);
+
+        try {
+            // Firestore에 데이터 저장
+            await addDoc(collection(db, "supporters"), {
+                name: formData.name,
+                phone: formData.phone,
+                blogId: formData.blogId,
+                address: formData.address,
+                selectedProduct: selectedProduct,
+                agreed: isAgreed,
+                createdAt: serverTimestamp()
+            });
+
+            // 성공 알림 및 초기화
+            alert('신청이 완료되었습니다! 🎉');
+            setFormData({
+                name: '',
+                phone: '',
+                blogId: '',
+                address: ''
+            });
+            setSelectedProduct(null);
+            setIsAgreed(false);
+
+        } catch (error) {
+            console.error("Error adding document: ", error);
+            alert('오류가 발생했습니다. 다시 시도해주세요.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -310,9 +341,10 @@ const SupportersPage = () => {
                     <div className="pt-4">
                         <button
                             type="submit"
-                            className="w-full bg-gradient-to-r from-amber-700 via-amber-800 to-amber-900 text-white py-4 px-6 rounded-xl font-semibold shadow-lg shadow-amber-900/30 hover:shadow-xl hover:shadow-amber-900/40 hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-rose-300"
+                            disabled={isSubmitting}
+                            className={`w-full bg-gradient-to-r from-amber-700 via-amber-800 to-amber-900 text-white py-4 px-6 rounded-xl font-semibold shadow-lg shadow-amber-900/30 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-rose-300 ${isSubmitting ? 'opacity-70 cursor-wait' : 'hover:shadow-xl hover:shadow-amber-900/40 hover:-translate-y-1'}`}
                         >
-                            🍫 제출하기
+                            {isSubmitting ? '🍫 제출 중...' : '🍫 제출하기'}
                         </button>
                     </div>
 
