@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { db } from './firebase';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, doc, updateDoc } from 'firebase/firestore';
 import * as XLSX from 'xlsx';
 
 const AdminPage = () => {
     // 인증 및 데이터 상태
     const [isAdmin, setIsAdmin] = useState(false);
     const [password, setPassword] = useState('');
-    const [supporters, setSupporters] = useState([]);
+    const [reservations, setReservations] = useState([]);
     const [loading, setLoading] = useState(false);
 
     // 데이터 불러오기
-    const fetchSupporters = async () => {
+    const fetchReservations = async () => {
         setLoading(true);
         try {
-            const q = query(collection(db, "supporters"), orderBy("createdAt", "desc"));
+            const q = query(collection(db, "kids_class_reservations"), orderBy("createdAt", "desc"));
             const querySnapshot = await getDocs(q);
             const data = querySnapshot.docs.map(doc => ({
                 id: doc.id,
@@ -22,7 +22,7 @@ const AdminPage = () => {
                 // Timestamp를 보기 좋은 날짜 문자열로 변환
                 createdAt: doc.data().createdAt?.toDate().toLocaleString() || 'N/A'
             }));
-            setSupporters(data);
+            setReservations(data);
         } catch (error) {
             console.error("Error fetching documents: ", error);
             alert("데이터를 불러오는데 실패했습니다.");
@@ -36,24 +36,45 @@ const AdminPage = () => {
         e.preventDefault();
         if (password === 'admin1234') {
             setIsAdmin(true);
-            fetchSupporters();
+            fetchReservations();
         } else {
             alert('비밀번호가 올바르지 않습니다.');
             setPassword('');
         }
     };
 
+    // 입금 확인 및 예약 확정 처리
+    const handleConfirmPayment = async (id, item) => {
+        if (!window.confirm("입금을 확인하고 예약을 확정하시겠습니까?")) return;
+
+        try {
+            const docRef = doc(db, "kids_class_reservations", id);
+            await updateDoc(docRef, { status: "confirmed" });
+            fetchReservations();
+
+            // 안내 문구 클립보드 복사
+            const message = `[베리굿초콜릿] ${item.guardianName}님, 키즈 클래스 예약이 확정되었습니다. 예약시간: ${item.preferredDateTime}`;
+            await navigator.clipboard.writeText(message);
+            alert("예약이 확정되었고 안내 문자가 복사되었습니다!");
+        } catch (error) {
+            console.error("Error updating document: ", error);
+            alert("예약 확정 처리에 실패했습니다.");
+        }
+    };
+
     // 엑셀 다운로드 처리
     const handleExport = () => {
         // 엑셀로 변환할 데이터 가공 (필요한 컬럼만 선택)
-        const excelData = supporters.map(item => ({
+        const excelData = reservations.map(item => ({
             '신청일시': item.createdAt,
-            '성함': item.name,
+            '보호자성함': item.guardianName,
             '연락처': item.phone,
-            '선택제품': item.selectedProduct === 'A' ? 'A세트' : 'B세트',
-            '블로그주소': item.blogId,
-            '배송지': item.address,
-            '개인정보동의': item.agreed ? '동의함' : '미동의'
+            '아이이름': item.childName,
+            '나이': item.childAge,
+            '신청클래스': item.selectedClass,
+            '예약시간': item.preferredDateTime,
+            '알러지/메시지': item.allergyOrMessage,
+            '현재상태': item.status === 'confirmed' ? '예약 확정' : '입금 대기'
         }));
 
         // 워크시트 생성
@@ -61,22 +82,24 @@ const AdminPage = () => {
         // 컬럼 너비 설정 (옵션)
         const wscols = [
             { wch: 20 }, // 신청일시
-            { wch: 10 }, // 성함
+            { wch: 15 }, // 보호자성함
             { wch: 15 }, // 연락처
-            { wch: 10 }, // 선택제품
-            { wch: 30 }, // 블로그주소
-            { wch: 40 }, // 배송지
-            { wch: 10 }  // 개인정보동의
+            { wch: 15 }, // 아이이름
+            { wch: 10 }, // 나이
+            { wch: 20 }, // 신청클래스
+            { wch: 25 }, // 예약시간
+            { wch: 30 }, // 알러지/메시지
+            { wch: 15 }  // 현재상태
         ];
         ws['!cols'] = wscols;
 
         // 워크북 생성 및 시트 추가
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "체험단명단");
+        XLSX.utils.book_append_sheet(wb, ws, "키즈클래스명단");
 
-        // 파일 저장 (파일명: 베리굿_체험단_명단_YYYYMMDD.xlsx)
+        // 파일 저장 (파일명: 베리굿_키즈클래스_명단_YYYYMMDD.xlsx)
         const date = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-        XLSX.writeFile(wb, `베리굿_체험단_명단_${date}.xlsx`);
+        XLSX.writeFile(wb, `베리굿_키즈클래스_명단_${date}.xlsx`);
     };
 
     // === [화면 1] 관리자 로그인 ===
@@ -113,7 +136,7 @@ const AdminPage = () => {
                 {/* 헤더 */}
                 <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                     <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-                        📋 베리굿초콜릿 체험단 신청 현황
+                        🍫 베리굿초콜릿 키즈 클래스 예약 현황
                     </h1>
                     <button
                         onClick={handleExport}
@@ -133,36 +156,64 @@ const AdminPage = () => {
                                 <thead className="bg-gray-100 text-gray-700 uppercase font-bold border-b">
                                     <tr>
                                         <th className="px-6 py-4 whitespace-nowrap">신청일시</th>
-                                        <th className="px-6 py-4 whitespace-nowrap">성함</th>
-                                        <th className="px-6 py-4 whitespace-nowrap">연락처</th>
-                                        <th className="px-6 py-4 whitespace-nowrap">제품</th>
-                                        <th className="px-6 py-4 whitespace-nowrap">블로그</th>
-                                        <th className="px-6 py-4 min-w-[300px]">주소</th>
+                                        <th className="px-6 py-4 whitespace-nowrap">보호자</th>
+                                        <th className="px-6 py-4 whitespace-nowrap">아이</th>
+                                        <th className="px-6 py-4 whitespace-nowrap">클래스</th>
+                                        <th className="px-6 py-4 whitespace-nowrap">예약시간</th>
+                                        <th className="px-6 py-4 min-w-[200px]">남기실 말씀</th>
+                                        <th className="px-6 py-4 whitespace-nowrap">상태 및 관리</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200">
-                                    {supporters.length === 0 ? (
+                                    {reservations.length === 0 ? (
                                         <tr>
-                                            <td colSpan="6" className="text-center py-10 text-gray-500">
-                                                아직 신청 내역이 없습니다.
+                                            <td colSpan="7" className="text-center py-10 text-gray-500">
+                                                아직 예약 내역이 없습니다.
                                             </td>
                                         </tr>
                                     ) : (
-                                        supporters.map((item) => (
+                                        reservations.map((item) => (
                                             <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                                                 <td className="px-6 py-4 whitespace-nowrap text-gray-500">{item.createdAt}</td>
-                                                <td className="px-6 py-4 font-medium text-gray-900">{item.name}</td>
-                                                <td className="px-6 py-4 text-gray-600">{item.phone}</td>
+                                                <td className="px-6 py-4 font-medium text-gray-900">
+                                                    <div>{item.guardianName}</div>
+                                                    <div className="text-sm text-gray-500 font-normal mt-1">{item.phone}</div>
+                                                </td>
                                                 <td className="px-6 py-4">
-                                                    <span className={`px-2 py-1 rounded text-xs font-bold ${item.selectedProduct === 'A' ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700'}`}>
-                                                        {item.selectedProduct}세트
+                                                    <div className="font-medium text-gray-900">{item.childName}</div>
+                                                    <div className="text-sm text-gray-500 mt-1">{item.childAge}</div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className="px-2 py-1 rounded text-xs font-bold bg-amber-100 text-amber-800">
+                                                        {item.selectedClass}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 text-gray-600 max-w-xs truncate" title={item.blogId}>
-                                                    {item.blogId}
+                                                <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-800">
+                                                    {item.preferredDateTime}
                                                 </td>
-                                                <td className="px-6 py-4 text-gray-600">
-                                                    {item.address}
+                                                <td className="px-6 py-4 text-gray-600 text-sm max-w-xs break-words">
+                                                    {item.allergyOrMessage || '-'}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="flex items-center gap-2">
+                                                        {item.status === 'pending' ? (
+                                                            <>
+                                                                <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-700">
+                                                                    입금 대기
+                                                                </span>
+                                                                <button
+                                                                    onClick={() => handleConfirmPayment(item.id, item)}
+                                                                    className="px-3 py-1 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50 hover:text-green-600 transition-colors text-sm font-bold shadow-sm"
+                                                                >
+                                                                    ✅ 입금 확인
+                                                                </button>
+                                                            </>
+                                                        ) : (
+                                                            <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
+                                                                예약 확정
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))
@@ -171,7 +222,7 @@ const AdminPage = () => {
                             </table>
                         </div>
                         <div className="bg-gray-50 px-6 py-3 border-t text-sm text-gray-500 text-right">
-                            총 <b>{supporters.length}</b>명 신청
+                            총 <b>{reservations.length}</b>건 예약
                         </div>
                     </div>
                 )}
