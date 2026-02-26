@@ -1,8 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { db } from './firebase';
 import { collection, addDoc, onSnapshot, query, serverTimestamp } from 'firebase/firestore';
 
 const KidsClassPage = () => {
+    // 폼 레퍼런스 (플로팅 버튼 스크롤용)
+    const formRef = useRef(null);
+
+    // 커리큘럼 아코디언 열림 상태
+    const [isCurriculumOpen, setIsCurriculumOpen] = useState(false);
+
     // 폼 상태 관리
     const [formData, setFormData] = useState({
         guardianName: '',
@@ -90,8 +96,8 @@ const KidsClassPage = () => {
 
         // 나이 유효성 검사
         const age = parseInt(formData.childAge, 10);
-        if (isNaN(age) || age < 6 || age > 13) {
-            alert('키즈 베이킹 클래스는 6세부터 13세까지 참여 가능합니다.');
+        if (isNaN(age) || age < 5 || age > 12) {
+            alert('키즈 베이킹 클래스는 만 5세부터 만 12세까지 참여 가능합니다.');
             return;
         }
 
@@ -143,8 +149,8 @@ const KidsClassPage = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-amber-50">
-            {/* 메인 컨텐츠 컨테이너 */}
-            <div className="max-w-2xl mx-auto px-4 py-8 md:py-12">
+            {/* 메인 컨텐츠 컨테이너 (플로팅 버튼 공간 확보를 위해 pb-24 추가) */}
+            <div className="max-w-2xl mx-auto px-4 py-8 md:py-12 pb-24 relative">
 
                 {/* 상단 비주얼 영역 */}
                 <div className="flex flex-col items-center mb-10 text-center">
@@ -167,38 +173,98 @@ const KidsClassPage = () => {
                         />
                     </div>
 
-                    <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 md:p-8 shadow-sm border border-rose-100 w-full relative">
+                    <div className="bg-white/80 backdrop-blur-md rounded-3xl p-6 md:p-8 shadow-sm border border-rose-100 w-full relative">
                         <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-amber-400 text-white px-6 py-2 rounded-full font-bold shadow-md text-sm whitespace-nowrap">
                             👩‍🍳 달콤한 키즈 베이킹 클래스 👨‍🍳
                         </div>
-                        <ul className="mt-4 space-y-3 text-left text-amber-900 border-b border-rose-100/50 pb-6 mb-2">
-                            <li className="flex items-start gap-3">
-                                <span className="text-xl shrink-0">👧👦</span>
-                                <div>
-                                    <strong className="block text-rose-500">참여 대상</strong>
-                                    6세 - 13세 (초등학생)
+
+                        {/* 1. 기본 정보 요약 */}
+                        <div className="grid grid-cols-3 gap-2 md:gap-3 mt-4 mb-8">
+                            <div className="bg-rose-50/50 rounded-xl md:rounded-2xl p-3 md:p-4 flex flex-col items-center text-center border border-rose-100/50 justify-center">
+                                <span className="text-xl md:text-2xl mb-1 md:mb-2">👧👦</span>
+                                <span className="text-[10px] md:text-xs font-bold text-rose-400 mb-1">참여 대상</span>
+                                <span className="text-xs md:text-sm font-bold text-amber-900 break-keep">만 5세 - 12세</span>
+                            </div>
+                            <div className="bg-amber-50/50 rounded-xl md:rounded-2xl p-3 md:p-4 flex flex-col items-center text-center border border-amber-100/50 justify-center">
+                                <span className="text-xl md:text-2xl mb-1 md:mb-2">⏱️</span>
+                                <span className="text-[10px] md:text-xs font-bold text-amber-500 mb-1">소요 시간</span>
+                                <span className="text-xs md:text-sm font-bold text-amber-900 break-keep">약 90분</span>
+                            </div>
+                            <div className="bg-rose-50/50 rounded-xl md:rounded-2xl p-3 md:p-4 flex flex-col items-center text-center border border-rose-100/50 justify-center">
+                                <span className="text-xl md:text-2xl mb-1 md:mb-2">📍</span>
+                                <span className="text-[10px] md:text-xs font-bold text-rose-400 mb-1">클래스 장소</span>
+                                <span className="text-[10px] sm:text-xs md:text-sm font-bold text-amber-900 leading-tight">대구 수성구<br />상록로 11길 13</span>
+                            </div>
+                        </div>
+
+                        {/* 2. 스페셜 혜택 */}
+                        <div className="bg-amber-50/30 rounded-2xl p-5 mb-8 border border-dashed border-amber-200">
+                            <h4 className="text-sm font-bold text-amber-900 mb-3 flex items-center gap-2">
+                                <span className="text-amber-500">⭐</span> Special Point
+                            </h4>
+                            <ul className="space-y-3">
+                                <li className="flex items-start gap-2 text-sm text-amber-900/80">
+                                    <span className="text-amber-500 shrink-0">✅</span>
+                                    <span>
+                                        <strong className="text-amber-900">"베리굿 미니 초콜릿 공장 견학!"</strong><br />
+                                        <span className="text-xs">생카다이프 굽기와 피스타치오 페이스트를 만드는 마법 같은 과정을 직접 눈으로 구경해요!</span>
+                                    </span>
+                                </li>
+                                <li className="flex items-start gap-2 text-sm text-amber-900/80">
+                                    <span className="text-amber-500 shrink-0">🎁</span>
+                                    <span>
+                                        <strong className="text-amber-900">"베리굿초콜릿만의 프리미엄 패키지에 예쁘게 포장해서 가져가요."</strong>
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        {/* 3. 커리큘럼 안내 (아코디언) */}
+                        <div className="space-y-4">
+                            <button
+                                onClick={() => setIsCurriculumOpen(!isCurriculumOpen)}
+                                className="w-full bg-white/50 hover:bg-white/80 transition-all duration-300 border border-rose-100 rounded-xl p-4 flex items-center justify-between shadow-sm hover:shadow-md active:scale-[0.98] group"
+                            >
+                                <span className="text-sm font-bold text-amber-900 flex items-center gap-2">
+                                    <span className="text-rose-400 text-lg group-hover:animate-bounce origin-bottom">✨</span> 자세한 수업 내용 보기 (터치해서 열기/닫기)
+                                </span>
+                                <span className={`text-amber-500 text-xs transition-transform duration-300 ${isCurriculumOpen ? 'rotate-180' : ''}`}>
+                                    ▼
+                                </span>
+                            </button>
+
+                            {/* 아코디언 내용 영역 */}
+                            {isCurriculumOpen && (
+                                <div className="space-y-3 animate-fade-in-down">
+                                    {/* 두바이 쫀득 쿠키 */}
+                                    <div className="bg-white/60 rounded-2xl p-5 shadow-sm border border-rose-50 text-left">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <span className="text-xl">🍪</span>
+                                            <span className="font-bold text-amber-900">두바이 쫀득 쿠키</span>
+                                        </div>
+                                        <p className="text-sm text-amber-800/80 leading-relaxed">
+                                            준비된 마법의 두바이 속재료와 쫀득쫀득 쭈욱~ 늘어나는 마시멜로우를 내 손으로 직접 조물조물 감싸기! 마지막엔 코코아 파우더를 톡톡 뿌려 완성해요. <span className="text-rose-500 font-medium">(내가 원하는 크기와 모양으로!)</span>
+                                        </p>
+                                    </div>
+
+                                    {/* 두바이 초코 케이크 */}
+                                    <div className="bg-white/60 rounded-2xl p-5 shadow-sm border border-rose-50 text-left">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <span className="text-xl">🍓</span>
+                                            <span className="font-bold text-rose-800">두바이 초코 케이크</span>
+                                        </div>
+                                        <p className="text-sm text-amber-800/80 leading-relaxed">
+                                            진짜 리얼 초콜릿을 녹여 만든 촉촉한 시트 사이에, 바삭한 두바이 속재료와 달콤한 초코 가나슈 크림 듬뿍 샌딩하기! 마지막엔 상큼한 생딸기로 예쁘게 장식해요. <span className="text-rose-500 font-medium">(1호 케이크 사이즈)</span>
+                                        </p>
+                                    </div>
                                 </div>
-                            </li>
-                            <li className="flex items-start gap-3">
-                                <span className="text-xl shrink-0">⏱️</span>
-                                <div>
-                                    <strong className="block text-rose-500">소요 시간</strong>
-                                    약 90분 (1시간 30분)
-                                </div>
-                            </li>
-                            <li className="flex items-start gap-3">
-                                <span className="text-xl shrink-0">📍</span>
-                                <div>
-                                    <strong className="block text-rose-500">클래스 장소</strong>
-                                    대구 수성구 상록로 11길 13, 1층 베리굿초콜릿
-                                </div>
-                            </li>
-                        </ul>
+                            )}
+                        </div>
                     </div>
                 </div>
 
                 {/* 예약 폼 영역 컨테이너 */}
-                <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl shadow-rose-100/50 p-6 md:p-10 border border-rose-50">
+                <div ref={formRef} className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl shadow-rose-100/50 p-6 md:p-10 border border-rose-50">
                     <h2 className="text-2xl font-bold text-amber-900 mb-6 text-center">예약 신청하기</h2>
 
                     <form onSubmit={handleSubmit} className="space-y-8">
@@ -208,30 +274,32 @@ const KidsClassPage = () => {
                             <label className="block text-sm font-bold text-amber-900 mb-4">
                                 1. 클래스를 선택해주세요 <span className="text-rose-500">*</span>
                             </label>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-3">
                                 {/* 두바이 쫀득 쿠키 */}
                                 <div
                                     onClick={() => {
                                         setSelectedClass('두바이쫀득쿠키');
                                         setPreferredDateTime('');
                                     }}
-                                    className={`relative cursor-pointer rounded-2xl p-5 border-2 transition-all duration-300 ${selectedClass === '두바이쫀득쿠키'
+                                    className={`relative cursor-pointer rounded-2xl p-5 border-2 transition-all duration-300 active:scale-95 group ${selectedClass === '두바이쫀득쿠키'
                                         ? 'border-amber-400 bg-amber-50 shadow-md transform scale-[1.02]'
-                                        : 'border-rose-100 bg-white hover:border-amber-200 hover:bg-amber-50/30'
+                                        : 'border-rose-100 bg-white hover:border-amber-200 hover:bg-amber-50/50 hover:shadow-lg hover:-translate-y-1'
                                         }`}
                                 >
-                                    <div className="text-4xl mb-2">🍪</div>
+                                    <div className={`text-4xl mb-2 transition-transform duration-500 origin-bottom ${selectedClass !== '두바이쫀득쿠키' ? 'group-hover:animate-bounce' : ''}`}>🍪</div>
                                     <h3 className={`text-lg font-bold ${selectedClass === '두바이쫀득쿠키' ? 'text-amber-800' : 'text-gray-700'}`}>
                                         두바이쫀득쿠키
                                     </h3>
                                     <p className="text-sm text-gray-500 mt-1">바삭하고 쫀득한 피스타치오 듬뿍</p>
 
-                                    {selectedClass === '두바이쫀득쿠키' && (
+                                    {selectedClass === '두바이쫀득쿠키' ? (
                                         <div className="absolute top-4 right-4 text-amber-500">
                                             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                             </svg>
                                         </div>
+                                    ) : (
+                                        <div className="absolute -inset-1 bg-amber-100/30 rounded-2xl blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-1000 animate-pulse pointer-events-none -z-10"></div>
                                     )}
                                 </div>
 
@@ -241,23 +309,25 @@ const KidsClassPage = () => {
                                         setSelectedClass('두바이초콜릿케이크');
                                         setPreferredDateTime('');
                                     }}
-                                    className={`relative cursor-pointer rounded-2xl p-5 border-2 transition-all duration-300 ${selectedClass === '두바이초콜릿케이크'
+                                    className={`relative cursor-pointer rounded-2xl p-5 border-2 transition-all duration-300 active:scale-95 group ${selectedClass === '두바이초콜릿케이크'
                                         ? 'border-rose-400 bg-rose-50 shadow-md transform scale-[1.02]'
-                                        : 'border-rose-100 bg-white hover:border-rose-200 hover:bg-rose-50/30'
+                                        : 'border-rose-100 bg-white hover:border-rose-200 hover:bg-rose-50/50 hover:shadow-lg hover:-translate-y-1'
                                         }`}
                                 >
-                                    <div className="text-4xl mb-2">🍰</div>
+                                    <div className={`text-4xl mb-2 transition-transform duration-500 origin-bottom ${selectedClass !== '두바이초콜릿케이크' ? 'group-hover:animate-bounce' : ''}`}>🍰</div>
                                     <h3 className={`text-lg font-bold ${selectedClass === '두바이초콜릿케이크' ? 'text-rose-800' : 'text-gray-700'}`}>
                                         두바이초콜릿케이크
                                     </h3>
                                     <p className="text-sm text-gray-500 mt-1">진한 초콜릿과 바삭한 카다이프의 만남</p>
 
-                                    {selectedClass === '두바이초콜릿케이크' && (
+                                    {selectedClass === '두바이초콜릿케이크' ? (
                                         <div className="absolute top-4 right-4 text-rose-500">
                                             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                             </svg>
                                         </div>
+                                    ) : (
+                                        <div className="absolute -inset-1 bg-rose-100/30 rounded-2xl blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-1000 animate-pulse pointer-events-none -z-10"></div>
                                     )}
                                 </div>
                             </div>
@@ -324,19 +394,19 @@ const KidsClassPage = () => {
                                 {/* 아이 나이 */}
                                 <div>
                                     <label htmlFor="childAge" className="block text-sm font-medium text-amber-900 mb-1">
-                                        아이 나이 (6~13세) <span className="text-rose-500">*</span>
+                                        아이 나이 (만 5~12세) <span className="text-rose-500">*</span>
                                     </label>
                                     <div className="relative">
                                         <input
                                             type="number"
                                             id="childAge"
                                             name="childAge"
-                                            min="6"
-                                            max="13"
+                                            min="5"
+                                            max="12"
                                             value={formData.childAge}
                                             onChange={handleInputChange}
                                             className="w-full px-4 py-2.5 border border-rose-200 rounded-xl focus:ring-2 focus:ring-amber-300 focus:border-amber-300 outline-none transition-all pr-8"
-                                            placeholder="8"
+                                            placeholder="7"
                                             required
                                         />
                                         <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500">세</span>
@@ -372,7 +442,7 @@ const KidsClassPage = () => {
                                         위에서 먼저 체험할 제품을 선택해 주세요 👆
                                     </div>
                                 ) : (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                         {selectedClass === '두바이쫀득쿠키' && (
                                             <>
                                                 {['2월 28일 (토) 11:00 - 12:30', '3월 1일 (일) 11:00 - 12:30', '3월 2일 (월) 11:00 - 12:30'].map((time) => {
@@ -535,6 +605,19 @@ const KidsClassPage = () => {
                 <p className="text-center text-xs text-rose-300 mt-12 pb-8">
                     © VeryGood Chocolate. All rights reserved.
                 </p>
+
+                {/* 플로팅 '바로 예약하기' 버튼 */}
+                <div className="fixed bottom-0 left-0 w-full p-4 z-50 md:hidden pointer-events-none flex justify-center">
+                    <div className="w-full max-w-2xl pointer-events-auto">
+                        <button
+                            type="button"
+                            onClick={() => formRef.current?.scrollIntoView({ behavior: 'smooth' })}
+                            className="w-full bg-[#E56E25] hover:bg-[#d4621c] text-white py-4 px-6 rounded-2xl font-bold text-lg shadow-xl shadow-[#E56E25]/30 transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0"
+                        >
+                            👇 1분 만에 예약 신청하기
+                        </button>
+                    </div>
+                </div>
 
             </div>
         </div>
