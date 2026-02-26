@@ -156,9 +156,9 @@ const KidsClassPage = () => {
 
                     <div className="w-full rounded-3xl overflow-hidden shadow-xl shadow-rose-200/50 mb-8 border-4 border-white">
                         <img
-                            src="/poster.jpg"
+                            src="/cake-hero.webp"
                             alt="키즈 베이킹 클래스 포스터"
-                            className="w-full h-auto object-cover aspect-[4/5] object-center"
+                            className="w-full h-auto object-cover aspect-[1000/1414] object-center"
                             onError={(e) => {
                                 // 포스터 이미지가 없을 경우 대체 이미지나 영역 표시
                                 e.target.onerror = null;
@@ -471,7 +471,7 @@ const KidsClassPage = () => {
                                             <p className="font-bold text-gray-800 text-lg">
                                                 신한은행 110-583-680821
                                             </p>
-                                            <p className="text-sm text-gray-600">예금주: 천정민(베리굿초콜릿컴퍼니(VCC))</p>
+                                            <p className="text-sm text-gray-600">예금주: 베리굿초콜릿컴퍼니(VCC))</p>
                                         </div>
                                         <button
                                             type="button"
@@ -523,7 +523,7 @@ const KidsClassPage = () => {
                 <div className="mt-12 text-center">
                     <p className="text-amber-800 mb-3 text-sm font-medium">온라인 예약이 어려우신가요?</p>
                     <a
-                        href="tel:010-0000-0000"
+                        href="tel:070-7840-0717"
                         className="inline-flex items-center justify-center gap-2 bg-white/60 hover:bg-white text-amber-900 px-6 py-3 rounded-full shadow-sm hover:shadow-md border border-rose-100 transition-all font-bold group"
                     >
                         <span className="text-xl group-hover:scale-110 transition-transform">📞</span>
