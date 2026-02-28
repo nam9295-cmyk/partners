@@ -492,7 +492,7 @@ const KidsClassPage = () => {
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                         {selectedClass === '두바이쫀득쿠키' && (
                                             <>
-                                                {['2월 28일 (토) 11:00 - 12:30', '3월 1일 (일) 11:00 - 12:30', '3월 1일 (일) 17:00 - 18:30', '3월 2일 (월) 11:00 - 12:30'].map((time) => {
+                                                {['2월 28일 (토) 11:00 - 12:30', '3월 1일 (일) 11:00 - 12:30', '3월 2일 (월) 11:00 - 12:30'].map((time) => {
                                                     const currentCount = slotCounts[time] || 0;
                                                     const isForcedFull = time === '2월 28일 (토) 11:00 - 12:30';
                                                     const isFull = isForcedFull || currentCount >= MAX_CAPACITY;
@@ -523,7 +523,7 @@ const KidsClassPage = () => {
                                         )}
                                         {selectedClass === '두바이초콜릿케이크' && (
                                             <>
-                                                {['2월 28일 (토) 15:00 - 16:30', '2월 28일 (토) 17:00 - 18:30', '3월 1일 (일) 15:00 - 16:30', '3월 2일 (월) 15:00 - 16:30'].map((time) => {
+                                                {['2월 28일 (토) 15:00 - 16:30', '2월 28일 (토) 17:00 - 18:30', '3월 1일 (일) 15:00 - 16:30', '3월 1일 (일) 17:00 - 18:30', '3월 2일 (월) 15:00 - 16:30'].map((time) => {
                                                     const currentCount = slotCounts[time] || 0;
                                                     const isForcedLowCapacity = time === '2월 28일 (토) 17:00 - 18:30';
                                                     const isForcedMediumCapacity = time === '2월 28일 (토) 15:00 - 16:30';
