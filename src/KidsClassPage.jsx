@@ -492,7 +492,7 @@ const KidsClassPage = () => {
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                         {selectedClass === '두바이쫀득쿠키' && (
                                             <>
-                                                {['2월 28일 (토) 11:00 - 12:30', '3월 1일 (일) 11:00 - 12:30', '3월 2일 (월) 11:00 - 12:30'].map((time) => {
+                                                {['2월 28일 (토) 11:00 - 12:30', '3월 1일 (일) 11:00 - 12:30', '3월 1일 (일) 17:00 - 18:30', '3월 2일 (월) 11:00 - 12:30'].map((time) => {
                                                     const currentCount = slotCounts[time] || 0;
                                                     const isForcedFull = time === '2월 28일 (토) 11:00 - 12:30';
                                                     const isFull = isForcedFull || currentCount >= MAX_CAPACITY;
@@ -530,11 +530,10 @@ const KidsClassPage = () => {
 
                                                     let maxCapacityForSlot = MAX_CAPACITY;
                                                     if (isForcedLowCapacity) maxCapacityForSlot = 2;
-                                                    else if (isForcedMediumCapacity) maxCapacityForSlot = 2;
 
                                                     const isFull = currentCount >= maxCapacityForSlot;
                                                     const remaining = maxCapacityForSlot - currentCount;
-                                                    const showUrgency = (isForcedLowCapacity || isForcedMediumCapacity) && !isFull;
+                                                    const showUrgency = isForcedLowCapacity && !isFull;
 
                                                     return (
                                                         <button
