@@ -447,8 +447,9 @@ const KidsClassPage = () => {
                                             <>
                                                 {['2월 28일 (토) 11:00 - 12:30', '3월 1일 (일) 11:00 - 12:30', '3월 2일 (월) 11:00 - 12:30'].map((time) => {
                                                     const currentCount = slotCounts[time] || 0;
-                                                    const isFull = currentCount >= MAX_CAPACITY;
-                                                    const remaining = MAX_CAPACITY - currentCount;
+                                                    const isForcedFull = time === '2월 28일 (토) 11:00 - 12:30';
+                                                    const isFull = isForcedFull || currentCount >= MAX_CAPACITY;
+                                                    const remaining = isForcedFull ? 0 : MAX_CAPACITY - currentCount;
                                                     return (
                                                         <button
                                                             key={time}
@@ -475,10 +476,13 @@ const KidsClassPage = () => {
                                         )}
                                         {selectedClass === '두바이초콜릿케이크' && (
                                             <>
-                                                {['2월 28일 (토) 15:00 - 16:30', '3월 1일 (일) 15:00 - 16:30', '3월 2일 (월) 15:00 - 16:30'].map((time) => {
+                                                {['2월 28일 (토) 17:00 - 18:30', '3월 1일 (일) 15:00 - 16:30', '3월 2일 (월) 15:00 - 16:30'].map((time) => {
                                                     const currentCount = slotCounts[time] || 0;
-                                                    const isFull = currentCount >= MAX_CAPACITY;
-                                                    const remaining = MAX_CAPACITY - currentCount;
+                                                    const isForcedLowCapacity = time === '2월 28일 (토) 17:00 - 18:30';
+                                                    const isFull = currentCount >= (isForcedLowCapacity ? 2 : MAX_CAPACITY);
+                                                    const remaining = isForcedLowCapacity ? 2 - currentCount : MAX_CAPACITY - currentCount;
+                                                    const showUrgency = isForcedLowCapacity && !isFull;
+
                                                     return (
                                                         <button
                                                             key={time}
@@ -489,12 +493,16 @@ const KidsClassPage = () => {
                                                                 ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
                                                                 : preferredDateTime === time
                                                                     ? 'border-rose-400 bg-rose-50 text-rose-800 shadow-sm'
-                                                                    : 'border-rose-100 bg-white text-gray-600 hover:border-rose-200 hover:bg-rose-50/30'
+                                                                    : showUrgency
+                                                                        ? 'border-rose-300 bg-rose-50/50 text-gray-600 hover:border-rose-400 hover:bg-rose-100/50 animate-pulse'
+                                                                        : 'border-rose-100 bg-white text-gray-600 hover:border-rose-200 hover:bg-rose-50/30'
                                                                 }`}
                                                         >
                                                             <span>{time}</span>
                                                             {isFull ? (
                                                                 <span className="text-xs font-normal opacity-80">마감되었습니다 😭</span>
+                                                            ) : showUrgency ? (
+                                                                <span className="text-xs font-bold text-rose-600 animate-bounce mt-1">🔥 마감임박! 잔여: {remaining}자리</span>
                                                             ) : (
                                                                 <span className="text-xs font-normal text-rose-600 opacity-90">잔여: {remaining}자리</span>
                                                             )}
