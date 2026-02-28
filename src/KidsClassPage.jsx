@@ -188,12 +188,12 @@ const KidsClassPage = () => {
                 {/* 실시간 뷰어 카운터 바지 (스크롤 시에도 상단 중앙에 고정) */}
                 {viewerCount > 0 && (
                     <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 animate-fade-in-down pointer-events-none">
-                        <div className="bg-black/80 backdrop-blur-md text-white px-4 py-2 rounded-full text-xs font-bold flex items-center justify-center gap-2 shadow-xl border border-white/20 whitespace-nowrap">
+                        <div className="bg-white/60 backdrop-blur-xl text-amber-900 px-5 py-2.5 rounded-full text-xs font-bold flex items-center justify-center gap-2 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-white/60 whitespace-nowrap transition-all duration-300">
                             <span className="relative flex h-2 w-2 shrink-0">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
                             </span>
-                            현재 <span className="text-amber-300 mx-0.5">{viewerCount}명</span>이 보고 있어요 👀
+                            현재 <span className="text-rose-500 mx-0.5">{viewerCount}명</span>이 보고 있어요 👀
                         </div>
                     </div>
                 )}
