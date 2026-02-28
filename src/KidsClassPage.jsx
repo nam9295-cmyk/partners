@@ -530,11 +530,11 @@ const KidsClassPage = () => {
 
                                                     let maxCapacityForSlot = MAX_CAPACITY;
                                                     if (isForcedLowCapacity) maxCapacityForSlot = 2;
-                                                    else if (isForcedMediumCapacity) maxCapacityForSlot = 4;
+                                                    else if (isForcedMediumCapacity) maxCapacityForSlot = 2;
 
                                                     const isFull = currentCount >= maxCapacityForSlot;
                                                     const remaining = maxCapacityForSlot - currentCount;
-                                                    const showUrgency = isForcedLowCapacity && !isFull;
+                                                    const showUrgency = (isForcedLowCapacity || isForcedMediumCapacity) && !isFull;
 
                                                     return (
                                                         <button
