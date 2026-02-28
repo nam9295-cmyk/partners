@@ -523,11 +523,17 @@ const KidsClassPage = () => {
                                         )}
                                         {selectedClass === '두바이초콜릿케이크' && (
                                             <>
-                                                {['2월 28일 (토) 17:00 - 18:30', '3월 1일 (일) 15:00 - 16:30', '3월 2일 (월) 15:00 - 16:30'].map((time) => {
+                                                {['2월 28일 (토) 15:00 - 16:30', '2월 28일 (토) 17:00 - 18:30', '3월 1일 (일) 15:00 - 16:30', '3월 2일 (월) 15:00 - 16:30'].map((time) => {
                                                     const currentCount = slotCounts[time] || 0;
                                                     const isForcedLowCapacity = time === '2월 28일 (토) 17:00 - 18:30';
-                                                    const isFull = currentCount >= (isForcedLowCapacity ? 2 : MAX_CAPACITY);
-                                                    const remaining = isForcedLowCapacity ? 2 - currentCount : MAX_CAPACITY - currentCount;
+                                                    const isForcedMediumCapacity = time === '2월 28일 (토) 15:00 - 16:30';
+
+                                                    let maxCapacityForSlot = MAX_CAPACITY;
+                                                    if (isForcedLowCapacity) maxCapacityForSlot = 2;
+                                                    else if (isForcedMediumCapacity) maxCapacityForSlot = 4;
+
+                                                    const isFull = currentCount >= maxCapacityForSlot;
+                                                    const remaining = maxCapacityForSlot - currentCount;
                                                     const showUrgency = isForcedLowCapacity && !isFull;
 
                                                     return (
