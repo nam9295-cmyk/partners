@@ -53,7 +53,7 @@ const AdminPage = () => {
             fetchReservations();
 
             // 안내 문구 클립보드 복사
-            const message = `[베리굿초콜릿] ${item.guardianName}님, 키즈 클래스 예약이 확정되었습니다. 예약시간: ${item.preferredDateTime}`;
+            const message = `[베리굿초콜릿] ${item.childName}님, 달콤한 키즈 클래스 예약이 확정되었습니다! 🍫\n\n🗓 예약 일시: ${item.preferredDateTime}\n📍 매장 위치: 대구 수성구 상록로 11길 13\n\n[✔️ 방문 전 확인해 주세요!]\n👕 앞치마는 저희가 제공하지만, 초콜릿이 묻을 수 있으니 아끼는 새 옷이나 흰 옷은 피해주세요.\n🎀 위생을 위해 머리가 긴 아이들은 머리를 단정하게 묶고 방문해 주세요.\n⏰ 원활한 수업 진행을 위해 클래스 시작 5분 전까지 꼭 도착 부탁드립니다.\n\n아이들이 잊지 못할 행복한 추억을 만들 수 있도록 예쁘게 준비해 둘게요. 곧 뵙겠습니다! 🧑🍳`;
             await navigator.clipboard.writeText(message);
             alert("예약이 확정되었고 안내 문자가 복사되었습니다!");
         } catch (error) {
