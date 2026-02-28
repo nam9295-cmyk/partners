@@ -47,8 +47,12 @@ const KidsClassPage = () => {
     // 제출 상태
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // 실시간 예약 현황 가져오기
+    // 현재 보고 있는 사람 수 상태
+    const [viewerCount, setViewerCount] = useState(0);
+
+    // 실시간 예약 현황 가져오기 및 현재 보고 있는 사람 수 계산
     useEffect(() => {
+        // ... 기존 실시간 예약 현황 래퍼 ...
         const q = query(collection(db, "kids_class_reservations"));
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const counts = {};
@@ -63,12 +67,41 @@ const KidsClassPage = () => {
             console.error("Firebase onSnapshot Error:", error);
         });
 
-        // 컴포넌트 언마운트 시 구독 해제
-        return () => unsubscribe();
+        // 실시간 보고 있는 사람 수 (시간대별 가중치 적용)
+        const updateViewerCount = () => {
+            const hour = new Date().getHours();
+            let min, max;
+
+            // 새벽/아침 (00:00 ~ 08:59): 1 ~ 5명
+            if (hour >= 0 && hour < 9) {
+                min = 1; max = 5;
+            }
+            // 밤 늦게 (22:00 ~ 23:59): 3 ~ 10명
+            else if (hour >= 22) {
+                min = 3; max = 10;
+            }
+            // 낮/저녁 피크 시간대 (09:00 ~ 21:59): 8 ~ 28명
+            else {
+                min = 8; max = 28;
+            }
+
+            const randomCount = Math.floor(Math.random() * (max - min + 1)) + min;
+            setViewerCount(randomCount);
+        };
+
+        updateViewerCount(); // 초기 설정
+        const viewerInterval = setInterval(updateViewerCount, 15000 + Math.random() * 10000); // 15~25초마다 변경
+
+        // 컴포넌트 언마운트 시 구독 및 인터벌 해제
+        return () => {
+            unsubscribe();
+            clearInterval(viewerInterval);
+        };
     }, []);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
+        // ... 기존 코드 유지 ...
         setFormData(prev => ({
             ...prev,
             [name]: value
@@ -152,8 +185,22 @@ const KidsClassPage = () => {
             {/* 메인 컨텐츠 컨테이너 (플로팅 버튼 공간 확보를 위해 pb-24 추가) */}
             <div className="max-w-2xl mx-auto px-4 py-8 md:py-12 pb-24 relative">
 
+                {/* 실시간 뷰어 카운터 바지 (스크롤 시에도 상단 중앙에 고정) */}
+                {viewerCount > 0 && (
+                    <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 animate-fade-in-down pointer-events-none">
+                        <div className="bg-black/80 backdrop-blur-md text-white px-4 py-2 rounded-full text-xs font-bold flex items-center justify-center gap-2 shadow-xl border border-white/20 whitespace-nowrap">
+                            <span className="relative flex h-2 w-2 shrink-0">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                            </span>
+                            현재 <span className="text-amber-300 mx-0.5">{viewerCount}명</span>이 보고 있어요 👀
+                        </div>
+                    </div>
+                )}
+
                 {/* 상단 비주얼 영역 */}
-                <div className="flex flex-col items-center mb-10 text-center">
+                <div className="flex flex-col items-center mb-10 text-center relative mt-4">
+
                     <img
                         src="/logo.png"
                         alt="베리굿초콜릿 로고"
