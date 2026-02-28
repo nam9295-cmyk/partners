@@ -525,15 +525,10 @@ const KidsClassPage = () => {
                                             <>
                                                 {['2월 28일 (토) 15:00 - 16:30', '2월 28일 (토) 17:00 - 18:30', '3월 1일 (일) 15:00 - 16:30', '3월 1일 (일) 17:00 - 18:30', '3월 2일 (월) 15:00 - 16:30'].map((time) => {
                                                     const currentCount = slotCounts[time] || 0;
-                                                    const isForcedLowCapacity = time === '2월 28일 (토) 17:00 - 18:30';
-                                                    const isForcedMediumCapacity = time === '2월 28일 (토) 15:00 - 16:30';
-
-                                                    let maxCapacityForSlot = MAX_CAPACITY;
-                                                    if (isForcedLowCapacity) maxCapacityForSlot = 2;
-
-                                                    const isFull = currentCount >= maxCapacityForSlot;
-                                                    const remaining = maxCapacityForSlot - currentCount;
-                                                    const showUrgency = isForcedLowCapacity && !isFull;
+                                                    const isForcedFull = time === '2월 28일 (토) 15:00 - 16:30' || time === '2월 28일 (토) 17:00 - 18:30';
+                                                    const isFull = isForcedFull || currentCount >= (time === '2월 28일 (토) 17:00 - 18:30' ? 2 : MAX_CAPACITY);
+                                                    const remaining = isForcedFull ? 0 : (time === '2월 28일 (토) 17:00 - 18:30' ? 2 : MAX_CAPACITY) - currentCount;
+                                                    const showUrgency = !isForcedFull && time === '2월 28일 (토) 17:00 - 18:30' && !isFull;
 
                                                     return (
                                                         <button
