@@ -494,7 +494,7 @@ const KidsClassPage = () => {
                                             <>
                                                 {['2월 28일 (토) 11:00 - 12:30', '3월 1일 (일) 11:00 - 12:30', '3월 2일 (월) 11:00 - 12:30'].map((time) => {
                                                     const currentCount = slotCounts[time] || 0;
-                                                    const isForcedFull = time === '2월 28일 (토) 11:00 - 12:30';
+                                                    const isForcedFull = time.startsWith('2월 28일') || time.startsWith('3월 1일');
                                                     const isFull = isForcedFull || currentCount >= MAX_CAPACITY;
                                                     const remaining = isForcedFull ? 0 : MAX_CAPACITY - currentCount;
                                                     return (
@@ -523,9 +523,9 @@ const KidsClassPage = () => {
                                         )}
                                         {selectedClass === '두바이초콜릿케이크' && (
                                             <>
-                                                {['2월 28일 (토) 15:00 - 16:30', '2월 28일 (토) 17:00 - 18:30', '3월 1일 (일) 15:00 - 16:30', '3월 1일 (일) 17:00 - 18:30', '3월 2일 (월) 15:00 - 16:30'].map((time) => {
+                                                {['2월 28일 (토) 15:00 - 16:30', '2월 28일 (토) 17:00 - 18:30', '3월 1일 (일) 15:00 - 16:30', '3월 1일 (일) 17:00 - 18:30', '3월 2일 (월) 13:00 - 14:30', '3월 2일 (월) 15:00 - 16:30'].map((time) => {
                                                     const currentCount = slotCounts[time] || 0;
-                                                    const isForcedFull = time === '2월 28일 (토) 15:00 - 16:30' || time === '2월 28일 (토) 17:00 - 18:30';
+                                                    const isForcedFull = time.startsWith('2월 28일') || time.startsWith('3월 1일');
                                                     const isFull = isForcedFull || currentCount >= (time === '2월 28일 (토) 17:00 - 18:30' ? 2 : MAX_CAPACITY);
                                                     const remaining = isForcedFull ? 0 : (time === '2월 28일 (토) 17:00 - 18:30' ? 2 : MAX_CAPACITY) - currentCount;
                                                     const showUrgency = !isForcedFull && time === '2월 28일 (토) 17:00 - 18:30' && !isFull;
