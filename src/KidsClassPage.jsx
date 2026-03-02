@@ -494,7 +494,7 @@ const KidsClassPage = () => {
                                             <>
                                                 {['2월 28일 (토) 11:00 - 12:30', '3월 1일 (일) 11:00 - 12:30', '3월 2일 (월) 11:00 - 12:30'].map((time) => {
                                                     const currentCount = slotCounts[time] || 0;
-                                                    const isForcedFull = time.startsWith('2월 28일') || time.startsWith('3월 1일');
+                                                    const isForcedFull = time.startsWith('2월 28일') || time.startsWith('3월 1일') || time.startsWith('3월 2일');
                                                     const isFull = isForcedFull || currentCount >= MAX_CAPACITY;
                                                     const remaining = isForcedFull ? 0 : MAX_CAPACITY - currentCount;
                                                     return (
