@@ -283,16 +283,6 @@ const KidsClassPage = () => {
                             {/* 아코디언 내용 영역 */}
                             {isCurriculumOpen && (
                                 <div className="space-y-3 animate-fade-in-down">
-                                    {/* 두바이 쫀득 쿠키 */}
-                                    <div className="bg-white/60 rounded-2xl p-5 shadow-sm border border-rose-50 text-left">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <span className="text-xl">🍪</span>
-                                            <span className="font-bold text-amber-900">두바이 쫀득 쿠키</span>
-                                        </div>
-                                        <p className="text-sm text-amber-800/80 leading-relaxed">
-                                            준비된 마법의 두바이 속재료와 쫀득쫀득 쭈욱~ 늘어나는 마시멜로우를 내 손으로 직접 조물조물 감싸기! 마지막엔 코코아 파우더를 톡톡 뿌려 완성해요. <span className="text-rose-500 font-medium">(내가 원하는 크기와 모양으로!)</span>
-                                        </p>
-                                    </div>
 
                                     {/* 두바이 초코 케이크 */}
                                     <div className="bg-white/60 rounded-2xl p-5 shadow-sm border border-rose-50 text-left">
@@ -321,35 +311,7 @@ const KidsClassPage = () => {
                             <label className="block text-sm font-bold text-amber-900 mb-4">
                                 1. 클래스를 선택해주세요 <span className="text-rose-500">*</span>
                             </label>
-                            <div className="grid grid-cols-2 gap-3">
-                                {/* 두바이 쫀득 쿠키 */}
-                                <div
-                                    onClick={() => {
-                                        setSelectedClass('두바이쫀득쿠키');
-                                        setPreferredDateTime('');
-                                    }}
-                                    className={`relative cursor-pointer rounded-2xl p-5 border-2 transition-all duration-300 active:scale-95 group ${selectedClass === '두바이쫀득쿠키'
-                                        ? 'border-amber-400 bg-amber-50 shadow-md transform scale-[1.02]'
-                                        : 'border-rose-100 bg-white hover:border-amber-200 hover:bg-amber-50/50 hover:shadow-lg hover:-translate-y-1'
-                                        }`}
-                                >
-                                    <div className={`text-4xl mb-2 transition-transform duration-500 origin-bottom ${selectedClass !== '두바이쫀득쿠키' ? 'group-hover:animate-bounce' : ''}`}>🍪</div>
-                                    <h3 className={`text-lg font-bold ${selectedClass === '두바이쫀득쿠키' ? 'text-amber-800' : 'text-gray-700'}`}>
-                                        두바이쫀득쿠키
-                                    </h3>
-                                    <p className="text-sm text-gray-500 mt-1">바삭하고 쫀득한 피스타치오 듬뿍</p>
-
-                                    {selectedClass === '두바이쫀득쿠키' ? (
-                                        <div className="absolute top-4 right-4 text-amber-500">
-                                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                            </svg>
-                                        </div>
-                                    ) : (
-                                        <div className="absolute -inset-1 bg-amber-100/30 rounded-2xl blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-1000 animate-pulse pointer-events-none -z-10"></div>
-                                    )}
-                                </div>
-
+                            <div className="grid grid-cols-1 gap-3">
                                 {/* 두바이 초콜릿 케이크 */}
                                 <div
                                     onClick={() => {
@@ -489,73 +451,60 @@ const KidsClassPage = () => {
                                         위에서 먼저 체험할 제품을 선택해 주세요 👆
                                     </div>
                                 ) : (
-                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                        {selectedClass === '두바이쫀득쿠키' && (
-                                            <>
-                                                {['2월 28일 (토) 11:00 - 12:30', '3월 1일 (일) 11:00 - 12:30', '3월 2일 (월) 11:00 - 12:30'].map((time) => {
-                                                    const currentCount = slotCounts[time] || 0;
-                                                    const isForcedFull = time.startsWith('2월 28일') || time.startsWith('3월 1일') || time.startsWith('3월 2일');
-                                                    const isFull = isForcedFull || currentCount >= MAX_CAPACITY;
-                                                    const remaining = isForcedFull ? 0 : MAX_CAPACITY - currentCount;
-                                                    return (
-                                                        <button
-                                                            key={time}
-                                                            type="button"
-                                                            disabled={isFull}
-                                                            onClick={() => setPreferredDateTime(time)}
-                                                            className={`px-4 py-3 rounded-xl border-2 text-sm font-bold text-center transition-all duration-200 flex flex-col items-center justify-center gap-1 ${isFull
-                                                                ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
-                                                                : preferredDateTime === time
-                                                                    ? 'border-amber-400 bg-amber-50 text-amber-800 shadow-sm'
-                                                                    : 'border-rose-100 bg-white text-gray-600 hover:border-amber-200 hover:bg-amber-50/30'
-                                                                }`}
-                                                        >
-                                                            <span>{time}</span>
-                                                            {isFull ? (
-                                                                <span className="text-xs font-normal opacity-80">마감되었습니다 😭</span>
-                                                            ) : (
-                                                                <span className="text-xs font-normal text-amber-600 opacity-90">잔여: {remaining}자리</span>
-                                                            )}
-                                                        </button>
-                                                    );
-                                                })}
-                                            </>
-                                        )}
+                                    <div className="flex flex-col gap-4">
                                         {selectedClass === '두바이초콜릿케이크' && (
                                             <>
-                                                {['2월 28일 (토) 15:00 - 16:30', '2월 28일 (토) 17:00 - 18:30', '3월 1일 (일) 15:00 - 16:30', '3월 1일 (일) 17:00 - 18:30', '3월 2일 (월) 13:00 - 14:30', '3월 2일 (월) 15:00 - 16:30'].map((time) => {
-                                                    const currentCount = slotCounts[time] || 0;
-                                                    const isForcedFull = time.startsWith('2월 28일') || time.startsWith('3월 1일') || time.startsWith('3월 2일');
-                                                    const isFull = isForcedFull || currentCount >= (time === '2월 28일 (토) 17:00 - 18:30' ? 2 : MAX_CAPACITY);
-                                                    const remaining = isForcedFull ? 0 : (time === '2월 28일 (토) 17:00 - 18:30' ? 2 : MAX_CAPACITY) - currentCount;
-                                                    const showUrgency = !isForcedFull && time === '2월 28일 (토) 17:00 - 18:30' && !isFull;
+                                                {[
+                                                    {
+                                                        dateLabel: '3월 14일 (토)',
+                                                        times: ['3월 14일 (토) 11:00 - 12:30', '3월 14일 (토) 13:00 - 14:30']
+                                                    },
+                                                    {
+                                                        dateLabel: '3월 21일 (토)',
+                                                        times: ['3월 21일 (토) 11:00 - 12:30', '3월 21일 (토) 13:00 - 14:30']
+                                                    }
+                                                ].map((dateGroup, index) => (
+                                                    <div key={index} className="bg-white/60 border border-rose-100 rounded-2xl p-4 shadow-sm">
+                                                        <div className="text-sm font-bold text-amber-900 mb-3 flex items-center gap-2 border-b border-rose-100 pb-2">
+                                                            📅 {dateGroup.dateLabel}
+                                                        </div>
+                                                        <div className="grid grid-cols-2 gap-3">
+                                                            {dateGroup.times.map((time) => {
+                                                                const currentCount = slotCounts[time] || 0;
+                                                                const isForcedFull = false;
+                                                                const isFull = isForcedFull || currentCount >= MAX_CAPACITY;
+                                                                const remaining = isForcedFull ? 0 : MAX_CAPACITY - currentCount;
+                                                                const showUrgency = !isForcedFull && remaining <= 2 && remaining > 0;
 
-                                                    return (
-                                                        <button
-                                                            key={time}
-                                                            type="button"
-                                                            disabled={isFull}
-                                                            onClick={() => setPreferredDateTime(time)}
-                                                            className={`px-4 py-3 rounded-xl border-2 text-sm font-bold text-center transition-all duration-200 flex flex-col items-center justify-center gap-1 ${isFull
-                                                                ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
-                                                                : preferredDateTime === time
-                                                                    ? 'border-rose-400 bg-rose-50 text-rose-800 shadow-sm'
-                                                                    : showUrgency
-                                                                        ? 'border-rose-300 bg-rose-50/50 text-gray-600 hover:border-rose-400 hover:bg-rose-100/50 animate-pulse'
-                                                                        : 'border-rose-100 bg-white text-gray-600 hover:border-rose-200 hover:bg-rose-50/30'
-                                                                }`}
-                                                        >
-                                                            <span>{time}</span>
-                                                            {isFull ? (
-                                                                <span className="text-xs font-normal opacity-80">마감되었습니다 😭</span>
-                                                            ) : showUrgency ? (
-                                                                <span className="text-xs font-bold text-rose-600 animate-bounce mt-1">🔥 마감임박! 잔여: {remaining}자리</span>
-                                                            ) : (
-                                                                <span className="text-xs font-normal text-rose-600 opacity-90">잔여: {remaining}자리</span>
-                                                            )}
-                                                        </button>
-                                                    );
-                                                })}
+                                                                return (
+                                                                    <button
+                                                                        key={time}
+                                                                        type="button"
+                                                                        disabled={isFull}
+                                                                        onClick={() => setPreferredDateTime(time)}
+                                                                        className={`px-4 py-3 rounded-xl border-2 text-sm font-bold text-center transition-all duration-200 flex flex-col items-center justify-center gap-1 ${isFull
+                                                                            ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                                            : preferredDateTime === time
+                                                                                ? 'border-rose-400 bg-rose-50 text-rose-800 shadow-sm'
+                                                                                : showUrgency
+                                                                                    ? 'border-rose-300 bg-rose-50/50 text-gray-600 hover:border-rose-400 hover:bg-rose-100/50 animate-pulse'
+                                                                                    : 'border-rose-100 bg-white text-gray-600 hover:border-rose-200 hover:bg-rose-50/30'
+                                                                            }`}
+                                                                    >
+                                                                        <span>{time.split(' ').slice(2).join(' ')}</span>
+                                                                        {isFull ? (
+                                                                            <span className="text-xs font-normal opacity-80">마감되었습니다 😭</span>
+                                                                        ) : showUrgency ? (
+                                                                            <span className="text-xs font-bold text-rose-600 animate-bounce mt-1">🔥 마감임박! 잔여: {remaining}자리</span>
+                                                                        ) : (
+                                                                            <span className="text-xs font-normal text-rose-600 opacity-90">잔여: {remaining}자리</span>
+                                                                        )}
+                                                                    </button>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                ))}
                                             </>
                                         )}
                                     </div>
