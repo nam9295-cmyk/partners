@@ -457,11 +457,11 @@ const KidsClassPage = () => {
                                                 {[
                                                     {
                                                         dateLabel: '3월 14일 (토)',
-                                                        times: ['3월 14일 (토) 11:00 - 12:30', '3월 14일 (토) 13:00 - 14:30']
+                                                        times: ['3월 14일 (토) 13:30 - 15:00', '3월 14일 (토) 16:30 - 18:00']
                                                     },
                                                     {
                                                         dateLabel: '3월 21일 (토)',
-                                                        times: ['3월 21일 (토) 11:00 - 12:30', '3월 21일 (토) 13:00 - 14:30']
+                                                        times: ['3월 21일 (토) 13:30 - 15:00', '3월 21일 (토) 16:30 - 18:00']
                                                     }
                                                 ].map((dateGroup, index) => (
                                                     <div key={index} className="bg-white/60 border border-rose-100 rounded-2xl p-4 shadow-sm">
