@@ -471,7 +471,7 @@ const KidsClassPage = () => {
                                                         <div className="grid grid-cols-2 gap-3">
                                                             {dateGroup.times.map((time) => {
                                                                 const currentCount = slotCounts[time] || 0;
-                                                                const isForcedFull = false;
+                                                                const isForcedFull = time === '3월 14일 (토) 13:30 - 15:00';
                                                                 const isFull = isForcedFull || currentCount >= MAX_CAPACITY;
                                                                 const remaining = isForcedFull ? 0 : MAX_CAPACITY - currentCount;
                                                                 const showUrgency = !isForcedFull && remaining <= 2 && remaining > 0;
