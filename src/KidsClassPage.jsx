@@ -453,59 +453,91 @@ const KidsClassPage = () => {
                                 ) : (
                                     <div className="flex flex-col gap-4">
                                         {selectedClass === '두바이초콜릿케이크' && (
-                                            <>
-                                                {[
-                                                    {
-                                                        dateLabel: '3월 14일 (토)',
-                                                        times: ['3월 14일 (토) 13:30 - 15:00', '3월 14일 (토) 16:30 - 18:00']
-                                                    },
-                                                    {
-                                                        dateLabel: '3월 21일 (토)',
-                                                        times: ['3월 21일 (토) 13:30 - 15:00', '3월 21일 (토) 16:30 - 18:00']
+                                            <div className="bg-white/60 border border-rose-100 rounded-2xl p-4 sm:p-5 shadow-sm">
+                                                <div className="text-sm font-bold text-amber-900 mb-6 flex items-center justify-between">
+                                                    <span>📅 원하시는 날짜를 선택해주세요</span>
+                                                    <span className="text-xs font-normal text-amber-700/60 bg-white px-2 py-1 rounded-full border border-rose-50 hidden sm:inline-block">터치하여 넘겨보세요 ➡️</span>
+                                                </div>
+                                                
+                                                <style dangerouslySetInnerHTML={{__html: `
+                                                    .hide-scrollbar::-webkit-scrollbar {
+                                                        display: none;
                                                     }
-                                                ].map((dateGroup, index) => (
-                                                    <div key={index} className="bg-white/60 border border-rose-100 rounded-2xl p-4 shadow-sm">
-                                                        <div className="text-sm font-bold text-amber-900 mb-3 flex items-center gap-2 border-b border-rose-100 pb-2">
-                                                            📅 {dateGroup.dateLabel}
-                                                        </div>
-                                                        <div className="grid grid-cols-2 gap-3">
-                                                            {dateGroup.times.map((time) => {
-                                                                const currentCount = slotCounts[time] || 0;
-                                                                const isForcedFull = time === '3월 14일 (토) 13:30 - 15:00';
-                                                                const isFull = isForcedFull || currentCount >= MAX_CAPACITY;
-                                                                const remaining = isForcedFull ? 0 : MAX_CAPACITY - currentCount;
-                                                                const showUrgency = !isForcedFull && remaining <= 2 && remaining > 0;
+                                                `}} />
+                                                
+                                                <div className="flex gap-3 sm:gap-4 overflow-x-auto pt-5 pb-5 px-2 -mx-2 snap-x snap-mandatory hide-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                                                    {[
+                                                        { month: 3, date: 21, day: '토', fullString: '3월 21일 (토) 13:30 - 15:00' },
+                                                        { month: 3, date: 28, day: '토', fullString: '3월 28일 (토) 13:30 - 15:00' },
+                                                        { month: 4, date: 4, day: '토', fullString: '4월 4일 (토) 13:30 - 15:00' },
+                                                        { month: 4, date: 11, day: '토', fullString: '4월 11일 (토) 13:30 - 15:00' },
+                                                        { month: 4, date: 18, day: '토', fullString: '4월 18일 (토) 13:30 - 15:00' },
+                                                        { month: 4, date: 25, day: '토', fullString: '4월 25일 (토) 13:30 - 15:00' }
+                                                    ].map((item, index) => {
+                                                        const timeStr = item.fullString;
+                                                        const currentCount = slotCounts[timeStr] || 0;
+                                                        const isFull = currentCount >= MAX_CAPACITY;
+                                                        const remaining = MAX_CAPACITY - currentCount;
+                                                        const showUrgency = !isFull && remaining <= 2 && remaining > 0;
+                                                        const isSelected = preferredDateTime === timeStr;
 
-                                                                return (
-                                                                    <button
-                                                                        key={time}
-                                                                        type="button"
-                                                                        disabled={isFull}
-                                                                        onClick={() => setPreferredDateTime(time)}
-                                                                        className={`px-4 py-3 rounded-xl border-2 text-sm font-bold text-center transition-all duration-200 flex flex-col items-center justify-center gap-1 ${isFull
-                                                                            ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
-                                                                            : preferredDateTime === time
-                                                                                ? 'border-rose-400 bg-rose-50 text-rose-800 shadow-sm'
-                                                                                : showUrgency
-                                                                                    ? 'border-rose-300 bg-rose-50/50 text-gray-600 hover:border-rose-400 hover:bg-rose-100/50 animate-pulse'
-                                                                                    : 'border-rose-100 bg-white text-gray-600 hover:border-rose-200 hover:bg-rose-50/30'
-                                                                            }`}
-                                                                    >
-                                                                        <span>{time.split(' ').slice(2).join(' ')}</span>
-                                                                        {isFull ? (
-                                                                            <span className="text-xs font-normal opacity-80">마감되었습니다 😭</span>
-                                                                        ) : showUrgency ? (
-                                                                            <span className="text-xs font-bold text-rose-600 animate-bounce mt-1">🔥 마감임박! 잔여: {remaining}자리</span>
-                                                                        ) : (
-                                                                            <span className="text-xs font-normal text-rose-600 opacity-90">잔여: {remaining}자리</span>
-                                                                        )}
-                                                                    </button>
-                                                                );
-                                                            })}
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </>
+                                                        return (
+                                                            <button
+                                                                key={index}
+                                                                type="button"
+                                                                disabled={isFull}
+                                                                onClick={() => setPreferredDateTime(timeStr)}
+                                                                className={`min-w-[105px] sm:min-w-[115px] snap-center shrink-0 flex flex-col items-center pt-5 pb-4 px-2 rounded-2xl border-2 transition-all duration-300 relative ${
+                                                                    isFull
+                                                                        ? 'border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed'
+                                                                        : isSelected
+                                                                            ? 'border-rose-400 bg-rose-50 shadow-md transform scale-[1.03] z-10'
+                                                                            : 'border-rose-100 bg-white hover:border-rose-200 hover:bg-rose-50/50 hover:shadow-sm'
+                                                                }`}
+                                                            >
+                                                                {/* 상태 뱃지 */}
+                                                                {isFull ? (
+                                                                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gray-200 text-gray-500 text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap border border-white">
+                                                                        마감 😭
+                                                                    </div>
+                                                                ) : showUrgency ? (
+                                                                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-rose-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap animate-pulse shadow-sm border border-white">
+                                                                        {remaining}자리 남음!
+                                                                    </div>
+                                                                ) : isSelected && (
+                                                                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-amber-400 text-white text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap shadow-sm border border-white">
+                                                                        선택됨 ✔
+                                                                    </div>
+                                                                )}
+
+                                                                <span className={`text-[11px] font-bold mb-1 ${isFull ? 'text-gray-400' : isSelected ? 'text-rose-600' : 'text-amber-700/80'}`}>
+                                                                    {item.month}월
+                                                                </span>
+                                                                <span className={`text-3xl font-black mb-1 tracking-tight ${isFull ? 'text-gray-400' : isSelected ? 'text-rose-700' : 'text-amber-900'}`}>
+                                                                    {item.date}
+                                                                </span>
+                                                                <span className={`text-xs font-bold mb-3 ${isFull ? 'text-gray-400' : isSelected ? 'text-rose-600' : 'text-amber-800'}`}>
+                                                                    {item.day}요일
+                                                                </span>
+                                                                
+                                                                <div className={`w-8 h-[2px] rounded-full my-1 ${isSelected ? 'bg-rose-300' : 'bg-rose-100/50'}`}></div>
+                                                                
+                                                                <span className={`text-[10px] font-bold mt-2 ${isFull ? 'text-gray-400' : isSelected ? 'text-rose-600' : 'text-amber-900/60'}`}>
+                                                                    13:30 - 15:00
+                                                                </span>
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
+                                                
+                                                {/* 선택된 날짜 정보 하단 표시 */}
+                                                <div className="mt-1 pt-3 border-t border-rose-100 flex items-center justify-between px-1">
+                                                    <span className="text-sm font-medium text-amber-900/70">선택된 클래스</span>
+                                                    <span className={`text-sm font-bold ${preferredDateTime ? 'text-rose-600' : 'text-gray-400'}`}>
+                                                        {preferredDateTime ? preferredDateTime : '아직 선택하지 않았어요'}
+                                                    </span>
+                                                </div>
+                                            </div>
                                         )}
                                     </div>
                                 )}
