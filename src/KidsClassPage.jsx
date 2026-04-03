@@ -2,6 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { db } from './firebase';
 import { collection, addDoc, onSnapshot, query, serverTimestamp } from 'firebase/firestore';
 
+const CLASS_DATES = [
+    { month: 3, date: 21, day: '토', fullString: '3월 21일 (토) 13:30 - 15:00' },
+    { month: 3, date: 28, day: '토', fullString: '3월 28일 (토) 13:30 - 15:00', isManualFull: true },
+    { month: 4, date: 4, day: '토', fullString: '4월 4일 (토) 13:30 - 15:00', isManualFull: true },
+    { month: 4, date: 11, day: '토', fullString: '4월 11일 (토) 13:30 - 15:00' },
+    { month: 4, date: 18, day: '토', fullString: '4월 18일 (토) 13:30 - 15:00' },
+    { month: 4, date: 25, day: '토', fullString: '4월 25일 (토) 13:30 - 15:00' }
+];
+
 const KidsClassPage = () => {
     // 폼 레퍼런스 (플로팅 버튼 스크롤용)
     const formRef = useRef(null);
@@ -135,7 +144,8 @@ const KidsClassPage = () => {
         }
 
         // 예약 인원 더블 체크 방어 로직
-        if ((slotCounts[preferredDateTime] || 0) >= MAX_CAPACITY) {
+        const isManuallyClosed = CLASS_DATES.find(d => d.fullString === preferredDateTime)?.isManualFull;
+        if ((slotCounts[preferredDateTime] || 0) >= MAX_CAPACITY || isManuallyClosed) {
             alert('앗! 방금 선택하신 시간의 예약이 마감되었습니다. 다른 시간을 선택해 주세요.');
             setPreferredDateTime('');
             return;
@@ -466,17 +476,10 @@ const KidsClassPage = () => {
                                                 `}} />
                                                 
                                                 <div className="flex gap-3 sm:gap-4 overflow-x-auto pt-5 pb-5 px-2 -mx-2 snap-x snap-mandatory hide-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                                                    {[
-                                                        { month: 3, date: 21, day: '토', fullString: '3월 21일 (토) 13:30 - 15:00' },
-                                                        { month: 3, date: 28, day: '토', fullString: '3월 28일 (토) 13:30 - 15:00' },
-                                                        { month: 4, date: 4, day: '토', fullString: '4월 4일 (토) 13:30 - 15:00' },
-                                                        { month: 4, date: 11, day: '토', fullString: '4월 11일 (토) 13:30 - 15:00' },
-                                                        { month: 4, date: 18, day: '토', fullString: '4월 18일 (토) 13:30 - 15:00' },
-                                                        { month: 4, date: 25, day: '토', fullString: '4월 25일 (토) 13:30 - 15:00' }
-                                                    ].map((item, index) => {
+                                                    {CLASS_DATES.map((item, index) => {
                                                         const timeStr = item.fullString;
                                                         const currentCount = slotCounts[timeStr] || 0;
-                                                        const isFull = currentCount >= MAX_CAPACITY;
+                                                        const isFull = currentCount >= MAX_CAPACITY || item.isManualFull;
                                                         const remaining = MAX_CAPACITY - currentCount;
                                                         const showUrgency = !isFull && remaining <= 2 && remaining > 0;
                                                         const isSelected = preferredDateTime === timeStr;
