@@ -3,20 +3,44 @@ import { db } from './firebase';
 import { collection, addDoc, onSnapshot, query, serverTimestamp } from 'firebase/firestore';
 
 const CLASS_DATES = [
-    { month: 3, date: 21, day: '토', fullString: '3월 21일 (토) 13:30 - 15:00' },
-    { month: 3, date: 28, day: '토', fullString: '3월 28일 (토) 13:30 - 15:00', isManualFull: true },
-    { month: 4, date: 4, day: '토', fullString: '4월 4일 (토) 13:30 - 15:00', isManualFull: true },
-    { month: 4, date: 11, day: '토', fullString: '4월 11일 (토) 13:30 - 15:00' },
-    { month: 4, date: 18, day: '토', fullString: '4월 18일 (토) 13:30 - 15:00' },
-    { month: 4, date: 25, day: '토', fullString: '4월 25일 (토) 13:30 - 15:00' }
+    { month: 5, date: 1, day: '금', time: '11:00 - 12:30', fullString: '5월 1일 (금) 11:00 - 12:30' },
+    { month: 5, date: 1, day: '금', time: '14:00 - 15:30', fullString: '5월 1일 (금) 14:00 - 15:30' },
+    { month: 5, date: 1, day: '금', time: '16:30 - 18:00', fullString: '5월 1일 (금) 16:30 - 18:00' },
+    { month: 5, date: 2, day: '토', time: '11:00 - 12:30', fullString: '5월 2일 (토) 11:00 - 12:30' },
+    { month: 5, date: 2, day: '토', time: '14:00 - 15:30', fullString: '5월 2일 (토) 14:00 - 15:30' },
+    { month: 5, date: 2, day: '토', time: '16:30 - 18:00', fullString: '5월 2일 (토) 16:30 - 18:00' },
+    { month: 5, date: 3, day: '일', time: '11:00 - 12:30', fullString: '5월 3일 (일) 11:00 - 12:30' },
+    { month: 5, date: 3, day: '일', time: '14:00 - 15:30', fullString: '5월 3일 (일) 14:00 - 15:30' },
+    { month: 5, date: 3, day: '일', time: '16:30 - 18:00', fullString: '5월 3일 (일) 16:30 - 18:00' },
+    { month: 5, date: 4, day: '월', time: '11:00 - 12:30', fullString: '5월 4일 (월) 11:00 - 12:30' },
+    { month: 5, date: 4, day: '월', time: '14:00 - 15:30', fullString: '5월 4일 (월) 14:00 - 15:30' },
+    { month: 5, date: 4, day: '월', time: '16:30 - 18:00', fullString: '5월 4일 (월) 16:30 - 18:00' },
+    { month: 5, date: 5, day: '화', time: '11:00 - 12:30', fullString: '5월 5일 (화) 11:00 - 12:30' },
+    { month: 5, date: 5, day: '화', time: '14:00 - 15:30', fullString: '5월 5일 (화) 14:00 - 15:30' },
+    { month: 5, date: 5, day: '화', time: '16:30 - 18:00', fullString: '5월 5일 (화) 16:30 - 18:00' }
 ];
 
+const CLASS_DATE_GROUPS = CLASS_DATES.reduce((groups, item) => {
+    const key = `${item.month}-${item.date}-${item.day}`;
+
+    if (!groups.some((group) => group.key === key)) {
+        groups.push({
+            key,
+            month: item.month,
+            date: item.date,
+            day: item.day,
+            label: `${item.month}월 ${item.date}일 (${item.day})`
+        });
+    }
+
+    return groups;
+}, []);
+
 const KidsClassPage = () => {
+    const fixedClassName = '두바이초콜릿케이크';
+
     // 폼 레퍼런스 (플로팅 버튼 스크롤용)
     const formRef = useRef(null);
-
-    // 커리큘럼 아코디언 열림 상태
-    const [isCurriculumOpen, setIsCurriculumOpen] = useState(false);
 
     // 폼 상태 관리
     const [formData, setFormData] = useState({
@@ -40,15 +64,13 @@ const KidsClassPage = () => {
 
     // 선택된 예약 시간
     const [preferredDateTime, setPreferredDateTime] = useState('');
+    const [selectedDateKey, setSelectedDateKey] = useState('');
 
     // 예약 현황 (시간대별 예약 수)
     const [slotCounts, setSlotCounts] = useState({});
 
     // 클래스 최대 정원
     const MAX_CAPACITY = 6;
-
-    // 선택된 클래스 제품
-    const [selectedClass, setSelectedClass] = useState(null);
 
     // 동의 여부
     const [isAgreed, setIsAgreed] = useState(false);
@@ -120,12 +142,6 @@ const KidsClassPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // 유효성 검사
-        if (!selectedClass) {
-            alert('클래스를 선택해주세요!');
-            return;
-        }
-
         if (!preferredDateTime) {
             alert('희망 예약 일시를 선택해주세요!');
             return;
@@ -162,7 +178,7 @@ const KidsClassPage = () => {
                 preferredDateTime: preferredDateTime,
                 allergyOrMessage: formData.allergyOrMessage,
                 depositorName: formData.depositorName,
-                selectedClass: selectedClass,
+                selectedClass: fixedClassName,
                 agreed: isAgreed,
                 status: 'pending',
                 createdAt: serverTimestamp()
@@ -178,7 +194,7 @@ const KidsClassPage = () => {
                 allergyOrMessage: '',
                 depositorName: '',
             });
-            setSelectedClass(null);
+            setSelectedDateKey('');
             setPreferredDateTime('');
             setIsAgreed(false);
 
@@ -189,6 +205,8 @@ const KidsClassPage = () => {
             setIsSubmitting(false);
         }
     };
+
+    const availableTimeSlots = CLASS_DATES.filter((item) => `${item.month}-${item.date}-${item.day}` === selectedDateKey);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-amber-50">
@@ -243,14 +261,14 @@ const KidsClassPage = () => {
                                 <span className="text-xs md:text-sm font-bold text-amber-900 break-keep">만 5세 - 12세</span>
                             </div>
                             <div className="bg-amber-50/50 rounded-xl md:rounded-2xl p-3 md:p-4 flex flex-col items-center text-center border border-amber-100/50 justify-center">
-                                <span className="text-xl md:text-2xl mb-1 md:mb-2">⏱️</span>
-                                <span className="text-[10px] md:text-xs font-bold text-amber-500 mb-1">소요 시간</span>
-                                <span className="text-xs md:text-sm font-bold text-amber-900 break-keep">약 90분</span>
+                                <span className="text-xl md:text-2xl mb-1 md:mb-2">🍫</span>
+                                <span className="text-[10px] md:text-xs font-bold text-amber-500 mb-1">클래스 포인트</span>
+                                <span className="text-[10px] sm:text-xs md:text-sm font-bold text-amber-900 leading-tight">두바이 초콜릿<br />스타일 토핑</span>
                             </div>
                             <div className="bg-rose-50/50 rounded-xl md:rounded-2xl p-3 md:p-4 flex flex-col items-center text-center border border-rose-100/50 justify-center">
-                                <span className="text-xl md:text-2xl mb-1 md:mb-2">📍</span>
-                                <span className="text-[10px] md:text-xs font-bold text-rose-400 mb-1">클래스 장소</span>
-                                <span className="text-[10px] sm:text-xs md:text-sm font-bold text-amber-900 leading-tight">대구 수성구<br />상록로 11길 13</span>
+                                <span className="text-xl md:text-2xl mb-1 md:mb-2">🎂</span>
+                                <span className="text-[10px] md:text-xs font-bold text-rose-400 mb-1">마무리 장식</span>
+                                <span className="text-[10px] sm:text-xs md:text-sm font-bold text-amber-900 leading-tight">버터크림 파이핑으로<br />나만의 케이크 완성</span>
                             </div>
                         </div>
 
@@ -263,8 +281,8 @@ const KidsClassPage = () => {
                                 <li className="flex items-start gap-2 text-sm text-amber-900/80">
                                     <span className="text-amber-500 shrink-0">✅</span>
                                     <span>
-                                        <strong className="text-amber-900">"베리굿 미니 초콜릿 공장 견학!"</strong><br />
-                                        <span className="text-xs">생카다이프 굽기와 피스타치오 페이스트를 만드는 마법 같은 과정을 직접 눈으로 구경해요!</span>
+                                        <strong className="text-amber-900">"두바이 초콜릿 재료로 나만의 케이크를 완성해요!"</strong><br />
+                                        <span className="text-xs">바삭한 두바이 스타일 재료를 올리고, 마지막엔 버터크림 파이핑으로 각자만의 케이크를 꾸며요.</span>
                                     </span>
                                 </li>
                                 <li className="flex items-start gap-2 text-sm text-amber-900/80">
@@ -276,36 +294,17 @@ const KidsClassPage = () => {
                             </ul>
                         </div>
 
-                        {/* 3. 커리큘럼 안내 (아코디언) */}
+                        {/* 3. 커리큘럼 안내 */}
                         <div className="space-y-4">
-                            <button
-                                onClick={() => setIsCurriculumOpen(!isCurriculumOpen)}
-                                className="w-full bg-white/50 hover:bg-white/80 transition-all duration-300 border border-rose-100 rounded-xl p-4 flex items-center justify-between shadow-sm hover:shadow-md active:scale-[0.98] group"
-                            >
-                                <span className="text-sm font-bold text-amber-900 flex items-center gap-2">
-                                    <span className="text-rose-400 text-lg group-hover:animate-bounce origin-bottom">✨</span> 자세한 수업 내용 보기 (터치해서 열기/닫기)
-                                </span>
-                                <span className={`text-amber-500 text-xs transition-transform duration-300 ${isCurriculumOpen ? 'rotate-180' : ''}`}>
-                                    ▼
-                                </span>
-                            </button>
-
-                            {/* 아코디언 내용 영역 */}
-                            {isCurriculumOpen && (
-                                <div className="space-y-3 animate-fade-in-down">
-
-                                    {/* 두바이 초코 케이크 */}
-                                    <div className="bg-white/60 rounded-2xl p-5 shadow-sm border border-rose-50 text-left">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <span className="text-xl">🍓</span>
-                                            <span className="font-bold text-rose-800">두바이 초코 케이크</span>
-                                        </div>
-                                        <p className="text-sm text-amber-800/80 leading-relaxed">
-                                            진짜 리얼 초콜릿을 녹여 만든 촉촉한 시트 사이에, 바삭한 두바이 속재료와 달콤한 초코 가나슈 크림 듬뿍 샌딩하기! 마지막엔 상큼한 생딸기로 예쁘게 장식해요. <span className="text-rose-500 font-medium">(1호 케이크 사이즈)</span>
-                                        </p>
-                                    </div>
+                            <div className="bg-white/60 rounded-2xl p-5 shadow-sm border border-rose-50 text-left">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-xl">🍰</span>
+                                    <span className="font-bold text-rose-800">두바이 초콜릿 케이크 클래스</span>
                                 </div>
-                            )}
+                                <p className="text-sm text-amber-800/80 leading-relaxed">
+                                    두바이 초콜릿 스타일의 바삭한 재료와 달콤한 초콜릿을 활용해 케이크를 완성해요. 마지막에는 버터크림으로 파이핑하며 아이가 직접 자기만의 케이크를 꾸미는 클래스예요. <span className="text-rose-500 font-medium">(1호 케이크 사이즈)</span>
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -315,47 +314,10 @@ const KidsClassPage = () => {
                     <h2 className="text-2xl font-bold text-amber-900 mb-6 text-center">예약 신청하기</h2>
 
                     <form onSubmit={handleSubmit} className="space-y-8">
-
-                        {/* 1. 클래스 선택 */}
-                        <div>
-                            <label className="block text-sm font-bold text-amber-900 mb-4">
-                                1. 클래스를 선택해주세요 <span className="text-rose-500">*</span>
-                            </label>
-                            <div className="grid grid-cols-1 gap-3">
-                                {/* 두바이 초콜릿 케이크 */}
-                                <div
-                                    onClick={() => {
-                                        setSelectedClass('두바이초콜릿케이크');
-                                        setPreferredDateTime('');
-                                    }}
-                                    className={`relative cursor-pointer rounded-2xl p-5 border-2 transition-all duration-300 active:scale-95 group ${selectedClass === '두바이초콜릿케이크'
-                                        ? 'border-rose-400 bg-rose-50 shadow-md transform scale-[1.02]'
-                                        : 'border-rose-100 bg-white hover:border-rose-200 hover:bg-rose-50/50 hover:shadow-lg hover:-translate-y-1'
-                                        }`}
-                                >
-                                    <div className={`text-4xl mb-2 transition-transform duration-500 origin-bottom ${selectedClass !== '두바이초콜릿케이크' ? 'group-hover:animate-bounce' : ''}`}>🍰</div>
-                                    <h3 className={`text-lg font-bold ${selectedClass === '두바이초콜릿케이크' ? 'text-rose-800' : 'text-gray-700'}`}>
-                                        두바이초콜릿케이크
-                                    </h3>
-                                    <p className="text-sm text-gray-500 mt-1">진한 초콜릿과 바삭한 카다이프의 만남</p>
-
-                                    {selectedClass === '두바이초콜릿케이크' ? (
-                                        <div className="absolute top-4 right-4 text-rose-500">
-                                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                            </svg>
-                                        </div>
-                                    ) : (
-                                        <div className="absolute -inset-1 bg-rose-100/30 rounded-2xl blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-1000 animate-pulse pointer-events-none -z-10"></div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* 2. 상세 정보 입력 */}
+                        {/* 1. 상세 정보 입력 */}
                         <div className="bg-rose-50/50 p-6 rounded-2xl space-y-5 border border-rose-100">
                             <label className="block text-sm font-bold text-amber-900 mb-2">
-                                2. 정보를 입력해주세요
+                                1. 날짜와 시간을 선택하고 정보를 입력해주세요
                             </label>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -456,27 +418,70 @@ const KidsClassPage = () => {
                                     희망 예약 날짜 및 시간 <span className="text-rose-500">*</span>
                                 </label>
 
-                                {!selectedClass ? (
-                                    <div className="bg-white/70 border border-dashed border-rose-200 rounded-xl p-6 text-center text-amber-800/70 text-sm">
-                                        위에서 먼저 체험할 제품을 선택해 주세요 👆
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col gap-4">
-                                        {selectedClass === '두바이초콜릿케이크' && (
-                                            <div className="bg-white/60 border border-rose-100 rounded-2xl p-4 sm:p-5 shadow-sm">
-                                                <div className="text-sm font-bold text-amber-900 mb-6 flex items-center justify-between">
-                                                    <span>📅 원하시는 날짜를 선택해주세요</span>
-                                                    <span className="text-xs font-normal text-amber-700/60 bg-white px-2 py-1 rounded-full border border-rose-50 hidden sm:inline-block">터치하여 넘겨보세요 ➡️</span>
-                                                </div>
-                                                
-                                                <style dangerouslySetInnerHTML={{__html: `
+                                <div className="flex flex-col gap-4">
+                                    <div className="bg-white/60 border border-rose-100 rounded-2xl p-4 sm:p-5 shadow-sm">
+                                        <div className="text-sm font-bold text-amber-900 mb-6 flex items-center justify-between">
+                                            <span>📅 원하시는 날짜를 선택해주세요</span>
+                                            <span className="text-xs font-normal text-amber-700/60 bg-white px-2 py-1 rounded-full border border-rose-50 hidden sm:inline-block">터치하여 넘겨보세요 ➡️</span>
+                                        </div>
+                                        
+                                        <style dangerouslySetInnerHTML={{__html: `
                                                     .hide-scrollbar::-webkit-scrollbar {
                                                         display: none;
                                                     }
                                                 `}} />
-                                                
-                                                <div className="flex gap-3 sm:gap-4 overflow-x-auto pt-5 pb-5 px-2 -mx-2 snap-x snap-mandatory hide-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                                                    {CLASS_DATES.map((item, index) => {
+                                        
+                                        <div className="flex gap-3 sm:gap-4 overflow-x-auto pt-5 pb-5 px-2 -mx-2 snap-x snap-mandatory hide-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                                            {CLASS_DATE_GROUPS.map((item, index) => {
+                                                const isSelected = selectedDateKey === item.key;
+
+                                                return (
+                                                    <button
+                                                        key={index}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setSelectedDateKey(item.key);
+                                                            setPreferredDateTime('');
+                                                        }}
+                                                        className={`min-w-[105px] sm:min-w-[115px] snap-center shrink-0 flex flex-col items-center pt-5 pb-4 px-2 rounded-2xl border-2 transition-all duration-300 relative ${
+                                                            isSelected
+                                                                ? 'border-rose-400 bg-rose-50 shadow-md transform scale-[1.03] z-10'
+                                                                : 'border-rose-100 bg-white hover:border-rose-200 hover:bg-rose-50/50 hover:shadow-sm'
+                                                        }`}
+                                                    >
+                                                        {isSelected && (
+                                                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-amber-400 text-white text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap shadow-sm border border-white">
+                                                                선택됨 ✔
+                                                            </div>
+                                                        )}
+
+                                                        <span className={`text-[11px] font-bold mb-1 ${isSelected ? 'text-rose-600' : 'text-amber-700/80'}`}>
+                                                            {item.month}월
+                                                        </span>
+                                                        <span className={`text-3xl font-black mb-1 tracking-tight ${isSelected ? 'text-rose-700' : 'text-amber-900'}`}>
+                                                            {item.date}
+                                                        </span>
+                                                        <span className={`text-xs font-bold mb-3 ${isSelected ? 'text-rose-600' : 'text-amber-800'}`}>
+                                                            {item.day}요일
+                                                        </span>
+                                                        
+                                                        <div className={`w-8 h-[2px] rounded-full my-1 ${isSelected ? 'bg-rose-300' : 'bg-rose-100/50'}`}></div>
+                                                        
+                                                        <span className={`text-[10px] font-bold mt-2 ${isSelected ? 'text-rose-600' : 'text-amber-900/60'}`}>
+                                                            시간 3회
+                                                        </span>
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+
+                                        {selectedDateKey && (
+                                            <div className="mt-2 border-t border-rose-100 pt-5">
+                                                <div className="text-sm font-bold text-amber-900 mb-4">
+                                                    ⏰ 시간을 선택해주세요
+                                                </div>
+                                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                                    {availableTimeSlots.map((item) => {
                                                         const timeStr = item.fullString;
                                                         const currentCount = slotCounts[timeStr] || 0;
                                                         const isFull = currentCount >= MAX_CAPACITY || item.isManualFull;
@@ -486,64 +491,53 @@ const KidsClassPage = () => {
 
                                                         return (
                                                             <button
-                                                                key={index}
+                                                                key={timeStr}
                                                                 type="button"
                                                                 disabled={isFull}
                                                                 onClick={() => setPreferredDateTime(timeStr)}
-                                                                className={`min-w-[105px] sm:min-w-[115px] snap-center shrink-0 flex flex-col items-center pt-5 pb-4 px-2 rounded-2xl border-2 transition-all duration-300 relative ${
+                                                                className={`relative rounded-2xl border-2 px-4 py-4 text-left transition-all duration-300 ${
                                                                     isFull
                                                                         ? 'border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed'
                                                                         : isSelected
-                                                                            ? 'border-rose-400 bg-rose-50 shadow-md transform scale-[1.03] z-10'
+                                                                            ? 'border-rose-400 bg-rose-50 shadow-md'
                                                                             : 'border-rose-100 bg-white hover:border-rose-200 hover:bg-rose-50/50 hover:shadow-sm'
                                                                 }`}
                                                             >
-                                                                {/* 상태 뱃지 */}
                                                                 {isFull ? (
-                                                                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gray-200 text-gray-500 text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap border border-white">
+                                                                    <div className="absolute -top-3 left-4 bg-gray-200 text-gray-500 text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap border border-white">
                                                                         마감 😭
                                                                     </div>
                                                                 ) : showUrgency ? (
-                                                                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-rose-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap animate-pulse shadow-sm border border-white">
+                                                                    <div className="absolute -top-3 left-4 bg-rose-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap animate-pulse shadow-sm border border-white">
                                                                         {remaining}자리 남음!
                                                                     </div>
                                                                 ) : isSelected && (
-                                                                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-amber-400 text-white text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap shadow-sm border border-white">
+                                                                    <div className="absolute -top-3 left-4 bg-amber-400 text-white text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap shadow-sm border border-white">
                                                                         선택됨 ✔
                                                                     </div>
                                                                 )}
 
-                                                                <span className={`text-[11px] font-bold mb-1 ${isFull ? 'text-gray-400' : isSelected ? 'text-rose-600' : 'text-amber-700/80'}`}>
-                                                                    {item.month}월
-                                                                </span>
-                                                                <span className={`text-3xl font-black mb-1 tracking-tight ${isFull ? 'text-gray-400' : isSelected ? 'text-rose-700' : 'text-amber-900'}`}>
-                                                                    {item.date}
-                                                                </span>
-                                                                <span className={`text-xs font-bold mb-3 ${isFull ? 'text-gray-400' : isSelected ? 'text-rose-600' : 'text-amber-800'}`}>
-                                                                    {item.day}요일
-                                                                </span>
-                                                                
-                                                                <div className={`w-8 h-[2px] rounded-full my-1 ${isSelected ? 'bg-rose-300' : 'bg-rose-100/50'}`}></div>
-                                                                
-                                                                <span className={`text-[10px] font-bold mt-2 ${isFull ? 'text-gray-400' : isSelected ? 'text-rose-600' : 'text-amber-900/60'}`}>
-                                                                    13:30 - 15:00
-                                                                </span>
+                                                                <div className={`text-lg font-black ${isFull ? 'text-gray-400' : isSelected ? 'text-rose-700' : 'text-amber-900'}`}>
+                                                                    {item.time}
+                                                                </div>
+                                                                <div className={`mt-1 text-xs font-medium ${isFull ? 'text-gray-400' : isSelected ? 'text-rose-600' : 'text-amber-800/70'}`}>
+                                                                    {item.month}월 {item.date}일 ({item.day})
+                                                </div>
                                                             </button>
                                                         );
                                                     })}
                                                 </div>
-                                                
-                                                {/* 선택된 날짜 정보 하단 표시 */}
-                                                <div className="mt-1 pt-3 border-t border-rose-100 flex items-center justify-between px-1">
-                                                    <span className="text-sm font-medium text-amber-900/70">선택된 클래스</span>
-                                                    <span className={`text-sm font-bold ${preferredDateTime ? 'text-rose-600' : 'text-gray-400'}`}>
-                                                        {preferredDateTime ? preferredDateTime : '아직 선택하지 않았어요'}
-                                                    </span>
-                                                </div>
                                             </div>
                                         )}
+                                        
+                                        <div className="mt-1 pt-3 border-t border-rose-100 flex items-center justify-between px-1">
+                                            <span className="text-sm font-medium text-amber-900/70">선택된 일정</span>
+                                            <span className={`text-sm font-bold ${preferredDateTime ? 'text-rose-600' : 'text-gray-400'}`}>
+                                                {preferredDateTime ? preferredDateTime : '아직 선택하지 않았어요'}
+                                            </span>
+                                        </div>
                                     </div>
-                                )}
+                                </div>
                             </div>
 
                             {/* 알러지 및 남기실 말씀 */}
