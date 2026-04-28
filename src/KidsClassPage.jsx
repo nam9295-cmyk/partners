@@ -3,13 +3,13 @@ import { db } from './firebase';
 import { collection, addDoc, onSnapshot, query, serverTimestamp } from 'firebase/firestore';
 
 const CLASS_DATES = [
-    { month: 5, date: 1, day: '금', time: '11:00 - 12:30', fullString: '5월 1일 (금) 11:00 - 12:30' },
-    { month: 5, date: 1, day: '금', time: '14:00 - 15:30', fullString: '5월 1일 (금) 14:00 - 15:30' },
+    { month: 5, date: 1, day: '금', time: '11:00 - 12:30', fullString: '5월 1일 (금) 11:00 - 12:30', isManualFull: true },
+    { month: 5, date: 1, day: '금', time: '14:00 - 15:30', fullString: '5월 1일 (금) 14:00 - 15:30', isManualFull: true },
     { month: 5, date: 1, day: '금', time: '16:30 - 18:00', fullString: '5월 1일 (금) 16:30 - 18:00' },
     { month: 5, date: 2, day: '토', time: '11:00 - 12:30', fullString: '5월 2일 (토) 11:00 - 12:30' },
-    { month: 5, date: 2, day: '토', time: '14:00 - 15:30', fullString: '5월 2일 (토) 14:00 - 15:30' },
+    { month: 5, date: 2, day: '토', time: '14:00 - 15:30', fullString: '5월 2일 (토) 14:00 - 15:30', isManualFull: true },
     { month: 5, date: 2, day: '토', time: '16:30 - 18:00', fullString: '5월 2일 (토) 16:30 - 18:00' },
-    { month: 5, date: 3, day: '일', time: '11:00 - 12:30', fullString: '5월 3일 (일) 11:00 - 12:30' },
+    { month: 5, date: 3, day: '일', time: '11:00 - 12:30', fullString: '5월 3일 (일) 11:00 - 12:30', isManualFull: true },
     { month: 5, date: 3, day: '일', time: '14:00 - 15:30', fullString: '5월 3일 (일) 14:00 - 15:30' },
     { month: 5, date: 3, day: '일', time: '16:30 - 18:00', fullString: '5월 3일 (일) 16:30 - 18:00' },
     { month: 5, date: 4, day: '월', time: '11:00 - 12:30', fullString: '5월 4일 (월) 11:00 - 12:30' },
